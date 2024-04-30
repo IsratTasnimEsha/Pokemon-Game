@@ -64,7 +64,7 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Play Screen")
 
-    background_image = pygame.image.load('Resources/field.png')
+    background_image = pygame.image.load('Resources/board_play.png')
     background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
     running = True
@@ -98,14 +98,14 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
         pokemon_fight_images0 = []
         pokemon_fight_images1 = []
         for i in player0_numbers:
-            pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_fight_{i}_0.png')
+            pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{i}_fight_0.png')
             if i<3:
                 pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
             else: 
                 pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (260, 300))
             pokemon_fight_images0.append((pokemon_fight_image0, i))
         for i in player1_numbers:
-            pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_fight_{i}_1.png')
+            pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{i}_fight_1.png')
             if i<3:
                 pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
             else:
@@ -146,15 +146,15 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
         positions = generate_random_positions(random.randint(2, 5), [])
 
         if selected_field == 'Electric Field':
-            field_image = pygame.image.load('Resources/electric.png')
+            field_image = pygame.image.load('Resources/field_electric.png')
             field_image = pygame.transform.scale(field_image, (100, 100))
 
         elif selected_field == 'Infernal Field':
-            field_image = pygame.image.load('Resources/infernal.png')
+            field_image = pygame.image.load('Resources/field_infernal.png')
             field_image = pygame.transform.scale(field_image, (100, 60))
 
         elif selected_field == 'Aquatic Field':
-            field_image = pygame.image.load('Resources/aquatic.png')
+            field_image = pygame.image.load('Resources/field_aquatic.png')
             field_image = pygame.transform.scale(field_image, (100, 80))
 
         draw_field_images(field_image, window, positions)
@@ -177,34 +177,52 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
                         if button_x <= mouse_x <= button_x + attack_choose_button_width and button_y <= mouse_y <= button_y + attack_choose_button_height:
                             current_attack_choose_button_clicked1 = i * 2 + j
                             print("Clicked button:", current_attack_choose_button_clicked1)
+
+        if toss_result == 'Team Rocket':
+            for i in range(3, 6):
+                if i in player0_numbers:
+                    current_pokemon_choose_button_clicked0 = i
+                    break
+            else:
+                if 0 in player0_numbers and selected_field == "Electric Field":
+                    current_pokemon_choose_button_clicked0 = 0 
+                elif 1 in player0_numbers and selected_field == "Infernal Field":
+                    current_pokemon_choose_button_clicked0 = 1
+                else:
+                    current_pokemon_choose_button_clicked0 = 2
     
+        '''
         if selected_field == "Electric Field":
             if 3 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 3
             elif 0 in player0_numbers:
-                current_pokemon_choose_button_clicked0 = 0
-            elif 1 in player0_numbers:
-                current_pokemon_choose_button_clicked0 = 1
+                if 3 not in player1_numbers:
+                    current_pokemon_choose_button_clicked0 = 0
             elif 2 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 2
+            else:
+                current_pokemon_choose_button_clicked0 = 1
         if selected_field == "Infernal Field":
             if 4 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 4
             elif 1 in player0_numbers:
-                current_pokemon_choose_button_clicked0 = 1
+                if 4 not in player1_numbers:
+                    current_pokemon_choose_button_clicked0 = 1
             elif 2 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 2
-            elif 0 in player0_numbers:
+            else:
                 current_pokemon_choose_button_clicked0 = 0
         if selected_field == "Aquatic Field":
             if 5 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 5
             elif 2 in player0_numbers:
-                current_pokemon_choose_button_clicked0 = 2
+                if 5 not in player1_numbers:
+                    current_pokemon_choose_button_clicked0 = 2
             elif 1 in player0_numbers:
                 current_pokemon_choose_button_clicked0 = 1
-            elif 0 in player0_numbers:
+            else:
                 current_pokemon_choose_button_clicked0 = 0
+        '''
 
         for x in pokemon_choose_button_x0:
             pygame.draw.rect(window, (0, 0, 0), (x - 2, pokemon_choose_button_y0 - 2, 70, 70), 2)

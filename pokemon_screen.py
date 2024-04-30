@@ -23,12 +23,12 @@ def draw_alert_message(window, message, font, color, bg_color, x, y, width, heig
     pygame.draw.rect(window, bg_color, (x - width // 2, y - height // 2, width, height))
     draw_text(message, font, color, window, x, y)
 
-background_image = pygame.image.load('Resources/vs_board.jpg')
+background_image = pygame.image.load('Resources/board_pokemon.jpg')
 background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
-spinner_img0 = pygame.image.load('Resources/pokemon_spinner_0.png')
+spinner_img0 = pygame.image.load('Resources/spinner_pokemon_0.png')
 spinner_img0 = pygame.transform.scale(spinner_img0, (190, 190))
-spinner_img1 = pygame.image.load('Resources/pokemon_spinner_1.png')
+spinner_img1 = pygame.image.load('Resources/spinner_pokemon_1.png')
 spinner_img1 = pygame.transform.scale(spinner_img1, (190, 190))
 
 def pokemon_screen():
@@ -127,7 +127,7 @@ def pokemon_screen():
                     pokemon_number = player0_numbers[i]
                     pokemon_image = pygame.image.load(f'Resources/pokemon_{pokemon_number}.png')
                 else:
-                    pokemon_image = pygame.image.load('Resources/blank_frame.png')
+                    pokemon_image = pygame.image.load('Resources/pokemon_blank.png')
                 
                 pokemon_image = pygame.transform.scale(pokemon_image, (105, 105))
                 x = 115 + i * 125
@@ -141,7 +141,7 @@ def pokemon_screen():
                     pokemon_number = player1_numbers[i]
                     pokemon_image = pygame.image.load(f'Resources/pokemon_{pokemon_number}.png')
                 else:
-                    pokemon_image = pygame.image.load('Resources/blank_frame.png')
+                    pokemon_image = pygame.image.load('Resources/pokemon_blank.png')
                 
                 pokemon_image = pygame.transform.scale(pokemon_image, (105, 105))
                 x = 1030 + i * 125

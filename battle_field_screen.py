@@ -28,9 +28,9 @@ def battle_field_screen(player0_numbers, player1_numbers):
     selected_field = None
     field_options = ["Electric Field", "Infernal Field", "Aquatic Field"]
     button_images = [
-        pygame.transform.scale(pygame.image.load('Resources/electric.png').convert_alpha(), (200, 200)),
-        pygame.transform.scale(pygame.image.load('Resources/infernal.png').convert_alpha(), (200, 160)),
-        pygame.transform.scale(pygame.image.load('Resources/aquatic.png').convert_alpha(), (200, 180))
+        pygame.transform.scale(pygame.image.load('Resources/field_electric.png').convert_alpha(), (200, 200)),
+        pygame.transform.scale(pygame.image.load('Resources/field_infernal.png').convert_alpha(), (200, 160)),
+        pygame.transform.scale(pygame.image.load('Resources/field_aquatic.png').convert_alpha(), (200, 180))
     ]
     button_centers = [
         (1145, HEIGHT // 2 - 65),
@@ -39,7 +39,7 @@ def battle_field_screen(player0_numbers, player1_numbers):
     ]
     button_rects = [button.get_rect(center=center) for button, center in zip(button_images, button_centers)]
 
-    background_image = pygame.image.load('Resources/battle_field_board.jpg')
+    background_image = pygame.image.load('Resources/board_battle_field.jpg')
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
     
     while running:

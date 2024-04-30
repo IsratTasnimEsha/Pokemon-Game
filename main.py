@@ -11,11 +11,16 @@ player0_numbers, player1_numbers = pokemon_screen()
 toss_result = toss_screen()
 
 selected_field = None
-field_options = ["Aquatic Field", "Infernal Field", "Electric Field"]
+field_options = ["Electric Field", "Infernal Field", "Aquatic Field"]
 
 if toss_result:
     if toss_result == 'Team Rocket' and selected_field is None:
-            selected_field = random.choice(field_options)
+        if 3 in player0_numbers:
+            selected_field = field_options[0]
+        elif 4 in player0_numbers:
+            selected_field = field_options[1]
+        else:
+            selected_field = field_options[2]
     else:
         selected_field = battle_field_screen(player0_numbers, player1_numbers)
                     

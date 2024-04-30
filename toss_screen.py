@@ -33,10 +33,10 @@ def toss_screen():
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Toss Screen")
  
-    background_image = pygame.image.load('Resources/toss_board.jpg')
+    background_image = pygame.image.load('Resources/board_toss.jpg')
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-    spinner_img = pygame.image.load('Resources/toss_spinner.png')
+    spinner_img = pygame.image.load('Resources/spinner_toss.png')
     spinner_img = pygame.transform.scale(spinner_img, (350, 350))
 
     clock = pygame.time.Clock()
