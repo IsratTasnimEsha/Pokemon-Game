@@ -20,7 +20,7 @@ def draw_text(text, font, color, surface, x, y):
     surface.blit(text_obj, text_rect)
 
 def toss():
-    return random.choice(["Team Rocket", "Me(Ash)"])
+    return random.choice(["Me(Ash)", "Team Rocket"])
 
 def toss_screen():
     angle = 0
