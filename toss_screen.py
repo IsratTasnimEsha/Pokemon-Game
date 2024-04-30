@@ -11,7 +11,7 @@ WINDOW_SIZE = (WIDTH, HEIGHT)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-font = pygame.font.SysFont(None, 25)
+font = pygame.font.SysFont(None, 50)
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
@@ -21,14 +21,6 @@ def draw_text(text, font, color, surface, x, y):
 
 def toss():
     return random.choice(["Team Rocket", "Me(Ash)"])
-
-def blur_background(image_path, target_size, blur_amount):
-    original_image = cv2.imread(image_path)
-    resized_image = cv2.resize(original_image, target_size)
-    blurred_image = cv2.GaussianBlur(resized_image, (blur_amount, blur_amount), 0)
-    blurred_image = cv2.cvtColor(blurred_image, cv2.COLOR_BGR2RGB)
-    pygame_surface = pygame.image.frombuffer(blurred_image.flatten(), target_size, 'RGB')
-    return pygame_surface
 
 def toss_screen():
     angle = 0
@@ -40,11 +32,12 @@ def toss_screen():
 
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Toss Screen")
+ 
+    background_image = pygame.image.load('Resources/toss_board.jpg')
+    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
-    blurred_background = blur_background('Resources/field.png', (WIDTH, HEIGHT), 31)
-
-    spinner_img = pygame.image.load('Resources/spinner.png')
-    spinner_img = pygame.transform.scale(spinner_img, (250, 250))
+    spinner_img = pygame.image.load('Resources/toss_spinner.png')
+    spinner_img = pygame.transform.scale(spinner_img, (350, 350))
 
     clock = pygame.time.Clock()
 
@@ -74,23 +67,24 @@ def toss_screen():
             if spin_duration % 15 == 0:  
                 current_toss = toss()
 
-        window.blit(blurred_background, (0, 0))
+        window.blit(background_image, (0, 0))
 
         spinner_rotated = pygame.transform.rotate(spinner_img, -angle)
-        spinner_rect = spinner_rotated.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 35))
+        spinner_rect = spinner_rotated.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 55))
         window.blit(spinner_rotated, spinner_rect)
         
         if not toss_started:
-            draw_text("Press the SPACE button to toss", font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 135)
+            draw_text("Press the SPACE button to toss", font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
         elif toss_result is None:
-            draw_text("Tossing: " + current_toss, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 135)
+            draw_text("Tossing: " + current_toss, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
         else:
-            draw_text("Toss Result: " + toss_result, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 135)
+            draw_text("Toss Result: " + toss_result, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
 
         pygame.display.flip()
         clock.tick(60)
         
-        # Return toss result and exit if toss is complete
         if toss_result is not None:
-            pygame.time.delay(2000)
+            pygame.time.delay(4000)
             return toss_result
+
+#toss_screen()

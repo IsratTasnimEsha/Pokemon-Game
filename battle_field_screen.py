@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 import cv2
 
 pygame.init()
@@ -10,49 +9,70 @@ WINDOW_SIZE = (WIDTH, HEIGHT)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)  # New color for selected field
 
 window = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("Pokemon Battle")
 
-font = pygame.font.SysFont(None, 25)  # Adjusted font size
+font = pygame.font.SysFont(None, 50)
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
-    text_rect = text_obj.get_rect()
-    text_rect.center = (x, y)
+    text_rect = text_obj.get_rect(center=(x, y))
     surface.blit(text_obj, text_rect)
 
-def blur_background(image_path, target_size, blur_amount):
-    original_image = cv2.imread(image_path)
-    resized_image = cv2.resize(original_image, target_size)
-    blurred_image = cv2.GaussianBlur(resized_image, (blur_amount, blur_amount), 0)
-    blurred_image = cv2.cvtColor(blurred_image, cv2.COLOR_BGR2RGB)
-    pygame_surface = pygame.image.frombuffer(blurred_image.flatten(), target_size, 'RGB')
-    return pygame_surface
+def draw_button_border(surface, rect, border_color, border_width):
+    pygame.draw.rect(surface, border_color, rect, border_width)
 
-def battle_field_screen(toss_result):
+def battle_field_screen(player0_numbers, player1_numbers):
     running = True
     selected_field = None
-    field_options = ["Aquatic Field", "Infernal Field", "Electric Field"]
+    field_options = ["Electric Field", "Infernal Field", "Aquatic Field"]
+    button_images = [
+        pygame.transform.scale(pygame.image.load('Resources/electric.png').convert_alpha(), (200, 200)),
+        pygame.transform.scale(pygame.image.load('Resources/infernal.png').convert_alpha(), (200, 160)),
+        pygame.transform.scale(pygame.image.load('Resources/aquatic.png').convert_alpha(), (200, 180))
+    ]
+    button_centers = [
+        (1145, HEIGHT // 2 - 65),
+        (1000, HEIGHT // 2 + 105),
+        (1300, HEIGHT // 2 + 105)
+    ]
+    button_rects = [button.get_rect(center=center) for button, center in zip(button_images, button_centers)]
 
-    # Load and blur the background image
-    background_image = blur_background('Resources/field.png', (WIDTH, HEIGHT), 31)
-
+    background_image = pygame.image.load('Resources/battle_field_board.jpg')
+    background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+    
     while running:
         window.fill(WHITE)
 
-        # Draw the blurred background image
         window.blit(background_image, (0, 0))
 
-        draw_text("Choose a battlefield:", font, BLACK, window, WIDTH // 2, 220)
+        player0_image = pygame.image.load('Resources/dashboard_player_0.png')
+        player0_image = pygame.transform.scale(player0_image, (145, 180))
+        window.blit(player0_image, (252, 50))
 
-        # Display field options
-        for i, field in enumerate(field_options):
-            text_color = BLACK
+        player1_image = pygame.image.load('Resources/dashboard_player_1.png')
+        player1_image = pygame.transform.scale(player1_image, (145, 180))
+        window.blit(player1_image, (252, 410))
+
+        player_positions = [
+            (200, 300), (330, 300), (450, 300),
+            (200, 660), (330, 660), (450, 660)
+        ]
+        for i, player_numbers in enumerate([player0_numbers, player1_numbers]):
+            for j, number in enumerate(player_numbers):
+                player_image = pygame.image.load(f'Resources/pokemon_{number}.png')
+                player_image = pygame.transform.scale(player_image, (100, 100))
+                rect = player_image.get_rect(center=player_positions[i * 3 + j])
+                window.blit(player_image, rect)
+                draw_button_border(window, rect, BLACK, 2)
+
+        draw_text("Choose a battlefield:", font, BLACK, window, 1150, 130)
+
+        for button, rect, field in zip(button_images, button_rects, field_options):
             if selected_field == field:
-                text_color = GRAY  # Change color if field is selected
-            draw_text(field, font, text_color, window, WIDTH // 2, 280 + i * 60)  # Adjust y-coordinate for spacing
+                draw_button_border(window, rect, BLACK, 3)
+            window.blit(button, rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -60,14 +80,17 @@ def battle_field_screen(toss_result):
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                for i, field in enumerate(field_options):
-                    if WIDTH // 2 - 100 <= mouse_x <= WIDTH // 2 + 100 and 250 + i * 60 - 25 <= mouse_y <= 250 + i * 60 + 25:  # Adjusted y-coordinate range
+                for rect, field in zip(button_rects, field_options):
+                    if rect.collidepoint(mouse_x, mouse_y):
                         selected_field = field
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return selected_field
 
         if selected_field:
-            draw_text("Selected Field: " + selected_field, font, BLACK, window, WIDTH // 2, 500)
+            draw_text("Selected Field: " + selected_field, font, BLACK, window, 1150, 650)
             pygame.display.flip()
-            pygame.time.delay(2000)
-            return selected_field
 
         pygame.display.flip()
+
+#battle_field_screen([0, 4, 2], [1, 5, 3])
