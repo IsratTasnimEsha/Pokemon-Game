@@ -11,7 +11,7 @@ WINDOW_SIZE = (WIDTH, HEIGHT)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-font = pygame.font.SysFont(None, 25)
+font = pygame.font.SysFont(None, 30)
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
@@ -49,7 +49,7 @@ def pokemon_screen():
         spin_duration1 = 0
         current_toss0 = None
         current_toss1 = None
-        show_alert = True  # Set flag to show the alert
+        show_alert = True  
         alert_timer = 1000
 
         window = pygame.display.set_mode(WINDOW_SIZE)
@@ -65,26 +65,25 @@ def pokemon_screen():
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN and not toss_started0 and not toss_started1:
-                    if event.key == pygame.K_SPACE:
-                        toss_started0 = True
-                        toss_started1 = True
-                        rotation_speed0 = 30
-                        rotation_speed1 = 30  
+                    toss_started0 = True
+                    toss_started1 = True
+                    rotation_speed0 = 30
+                    rotation_speed1 = 30  
+                    current_toss0 = random.randint(0, 5)
+                    while current_toss0 in player0_numbers:
                         current_toss0 = random.randint(0, 5)
-                        while current_toss0 in player0_numbers:
-                            current_toss0 = random.randint(0, 5)
+                    current_toss1 = random.randint(0, 5)
+                    while current_toss1 in player1_numbers:
                         current_toss1 = random.randint(0, 5)
-                        while current_toss1 in player1_numbers:
-                            current_toss1 = random.randint(0, 5)
 
 
             if toss_started0:
                 angle0 += rotation_speed0
                 angle0 %= 360
-                spin_duration0 += 1  # Move inside the if block
+                spin_duration0 += 1  
 
                 if rotation_speed0 > 0:
-                    if spin_duration0 >= 25:  
+                    if spin_duration0 >= 10:  
                         rotation_speed0 = 0
                         toss_result0 = current_toss0
 
@@ -97,10 +96,10 @@ def pokemon_screen():
             if toss_started1:
                 angle1 += rotation_speed1
                 angle1 %= 360
-                spin_duration1 += 1  # Move inside the if block
+                spin_duration1 += 1  
 
                 if rotation_speed1 > 0:
-                    if spin_duration1 >= 25:  
+                    if spin_duration1 >= 10:  
                         rotation_speed1 = 0
                         toss_result1 = current_toss1
 
@@ -160,7 +159,7 @@ def pokemon_screen():
             
             if not toss_started0 and not toss_started1:
                 if show_alert:
-                    draw_alert_message(window, "Press the SPACE button to toss", font, WHITE, (0, 0, 0, 255), WIDTH // 2, HEIGHT // 2, 300, 50)
+                    draw_alert_message(window, "Press any button to toss", font, WHITE, (0, 0, 0, 255), WIDTH // 2, HEIGHT // 2, 300, 50)
                     alert_timer -= 1
                     if alert_timer <= 0:
                         show_alert = False

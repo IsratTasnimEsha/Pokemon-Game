@@ -83,9 +83,8 @@ def battle_field_screen(player0_numbers, player1_numbers):
                 for rect, field in zip(button_rects, field_options):
                     if rect.collidepoint(mouse_x, mouse_y):
                         selected_field = field
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    return selected_field
+            elif event.type == pygame.KEYDOWN:    
+                return selected_field
 
         if selected_field:
             draw_text("Selected Field: " + selected_field, font, BLACK, window, 1150, 650)

@@ -60,7 +60,7 @@ def draw_attack_choose_buttons(window, attack_choose_button_texts, attack_choose
             text_rect = text_surface.get_rect(center=attack_choose_button_rect.center)
             window.blit(text_surface, text_rect)
 
-def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
+def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, round_1_pokemon0, round_1_pokemon1, round_2_pokemon0, round_2_pokemon1):
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Play Screen")
 
@@ -68,8 +68,7 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
     background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
     running = True
-    current_pokemon_choose_button_clicked0 = None
-    current_pokemon_choose_button_clicked1 = None
+
     current_attack_choose_button_clicked0 = None
     current_attack_choose_button_clicked1 = None
 
@@ -162,34 +161,9 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
-                pokemon_choose_button_width, pokemon_choose_button_height = 70, 70
-                for i, x in enumerate(pokemon_choose_button_x1):
-                    if x <= mouse_x <= x + pokemon_choose_button_width and pokemon_choose_button_y1 <= mouse_y <= pokemon_choose_button_y1 + pokemon_choose_button_height:
-                        current_pokemon_choose_button_clicked1 = pokemon_button_images1[i][1]
-
-                for i in range(2):
-                    for j in range(2):
-                        button_x = attack_choose_button_x_start1 + j * (attack_choose_button_width + attack_choose_button_spacing)
-                        button_y = attack_choose_button_y_start1 + i * (attack_choose_button_height + attack_choose_button_spacing)
-
-                        if button_x <= mouse_x <= button_x + attack_choose_button_width and button_y <= mouse_y <= button_y + attack_choose_button_height:
-                            current_attack_choose_button_clicked1 = i * 2 + j
-                            print("Clicked button:", current_attack_choose_button_clicked1)
-
-        if toss_result == 'Team Rocket':
-            for i in range(3, 6):
-                if i in player0_numbers:
-                    current_pokemon_choose_button_clicked0 = i
-                    break
-            else:
-                if 0 in player0_numbers and selected_field == "Electric Field":
-                    current_pokemon_choose_button_clicked0 = 0 
-                elif 1 in player0_numbers and selected_field == "Infernal Field":
-                    current_pokemon_choose_button_clicked0 = 1
-                else:
-                    current_pokemon_choose_button_clicked0 = 2
+        
+        if round_1_pokemon0 == None:
+            round_1_pokemon0 = player0_numbers[0]
     
         '''
         if selected_field == "Electric Field":
@@ -228,7 +202,7 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
             pygame.draw.rect(window, (0, 0, 0), (x - 2, pokemon_choose_button_y0 - 2, 70, 70), 2)
 
         for i in range(3):
-            if current_pokemon_choose_button_clicked0 == player0_numbers[i]:
+            if round_1_pokemon0 == player0_numbers[i]:
                 pokemon_button_images0[i][0].fill(RED, None, pygame.BLEND_RGBA_MULT)
                 if pokemon_fight_images0[i][1]<3:
                     window.blit(pokemon_fight_images0[i][0], (265, 305))
@@ -242,7 +216,7 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
             pygame.draw.rect(window, (0, 0, 0), (x - 2, pokemon_choose_button_y0 - 2, 70, 70), 2)
 
         for i in range(3):
-            if current_pokemon_choose_button_clicked1 == player1_numbers[i]:
+            if round_1_pokemon1 == player1_numbers[i]:
                 pokemon_button_images1[i][0].fill(BLUE, None, pygame.BLEND_RGBA_MULT)
                 if pokemon_fight_images1[i][1]<3:
                     window.blit(pokemon_fight_images1[i][0], (WIDTH-395, 305))
@@ -252,30 +226,30 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers):
         for i in range(3):
             window.blit(pokemon_button_images1[i][0], (pokemon_choose_button_x1[i], pokemon_choose_button_y1))
 
-        if current_pokemon_choose_button_clicked0 == 0 or current_pokemon_choose_button_clicked0 == 3:
+        if round_1_pokemon0 == 0 or round_1_pokemon0 == 3:
             attack_choose_button_texts0 = ["Thunderbolt", "Quick Attack", "Electro Ball", "Iron Tail"]
             draw_attack_choose_buttons(window, attack_choose_button_texts0, attack_choose_button_x_start0, attack_choose_button_y_start0, current_attack_choose_button_clicked0)
 
-        elif current_pokemon_choose_button_clicked0 == 1 or current_pokemon_choose_button_clicked0 == 4:
+        elif round_1_pokemon0 == 1 or round_1_pokemon0 == 4:
             attack_choose_button_texts0 = ["Ember", "Flamethrower", "Fire Spin", "Fire Fang"]
             draw_attack_choose_buttons(window, attack_choose_button_texts0, attack_choose_button_x_start0, attack_choose_button_y_start0, current_attack_choose_button_clicked0)
 
-        elif current_pokemon_choose_button_clicked0 == 2 or current_pokemon_choose_button_clicked0 == 5:
+        elif round_1_pokemon0 == 2 or round_1_pokemon0 == 5:
             attack_choose_button_texts0 = ["Water Gun", "Bubble Beam", "Water Pulse", "Aqua Tail"]
             draw_attack_choose_buttons(window, attack_choose_button_texts0, attack_choose_button_x_start0, attack_choose_button_y_start0, current_attack_choose_button_clicked0)
 
-        if current_pokemon_choose_button_clicked1 == 0 or current_pokemon_choose_button_clicked1 == 3:
+        if round_1_pokemon1 == 0 or round_1_pokemon1 == 3:
             attack_choose_button_texts1 = ["Thunderbolt", "Quick Attack", "Electro Ball", "Iron Tail"]
             draw_attack_choose_buttons(window, attack_choose_button_texts1, attack_choose_button_x_start1, attack_choose_button_y_start1, current_attack_choose_button_clicked1)
 
-        elif current_pokemon_choose_button_clicked1 == 1 or current_pokemon_choose_button_clicked1 == 4:
+        elif round_1_pokemon1 == 1 or round_1_pokemon1 == 4:
             attack_choose_button_texts1 = ["Ember", "Flamethrower", "Fire Spin", "Fire Fang"]
             draw_attack_choose_buttons(window, attack_choose_button_texts1, attack_choose_button_x_start1, attack_choose_button_y_start1, current_attack_choose_button_clicked1)
 
-        elif current_pokemon_choose_button_clicked1 == 2 or current_pokemon_choose_button_clicked1 == 5:
+        elif round_1_pokemon1 == 2 or round_1_pokemon1 == 5:
             attack_choose_button_texts1 = ["Water Gun", "Bubble Beam", "Water Pulse", "Aqua Tail"]
             draw_attack_choose_buttons(window, attack_choose_button_texts1, attack_choose_button_x_start1, attack_choose_button_y_start1, current_attack_choose_button_clicked1)
 
         pygame.display.flip()
 
-#play_screen('Team Rocket', random.choice(["Aquatic Field", "Infernal Field", "Electric Field"]), [1, 4, 2], [0, 3, 5])
+#play_screen('Team Rocket', random.choice(["Aquatic Field", "Infernal Field", "Electric Field"]), [1, 4, 2], [0, 3, 5], None, 3, None, None)

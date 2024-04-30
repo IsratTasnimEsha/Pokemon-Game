@@ -48,11 +48,10 @@ def toss_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN and not toss_started:
-                if event.key == pygame.K_SPACE:
-                    toss_started = True
-                    rotation_speed = 8  
-                    current_toss = toss()  
+            elif event.type == pygame.KEYDOWN and not toss_started:   
+                toss_started = True
+                rotation_speed = 8  
+                current_toss = toss()  
 
         if toss_started:
             angle += rotation_speed
@@ -74,7 +73,7 @@ def toss_screen():
         window.blit(spinner_rotated, spinner_rect)
         
         if not toss_started:
-            draw_text("Press the SPACE button to toss", font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
+            draw_text("Press any button to toss", font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
         elif toss_result is None:
             draw_text("Tossing: " + current_toss, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 170)
         else:
