@@ -13,6 +13,9 @@ BLACK = (0, 0, 0)
 
 font = pygame.font.SysFont(None, 50)
 
+pygame.mixer.init()
+spinner_sound = pygame.mixer.Sound('Resources/sound_spinner.mp3')
+
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
     text_rect = text_obj.get_rect()
@@ -52,6 +55,7 @@ def toss_screen():
                 toss_started = True
                 rotation_speed = 8  
                 current_toss = toss()  
+                spinner_sound.play() 
 
         if toss_started:
             angle += rotation_speed
@@ -62,7 +66,8 @@ def toss_screen():
                 if spin_duration >= 300:  
                     rotation_speed = 0
                     toss_result = current_toss
-
+                    spinner_sound.stop() 
+                    
             if spin_duration % 15 == 0:  
                 current_toss = toss()
 

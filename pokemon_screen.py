@@ -13,6 +13,9 @@ BLACK = (0, 0, 0)
 
 font = pygame.font.SysFont(None, 30)
 
+pygame.mixer.init()
+spinner_sound = pygame.mixer.Sound('Resources/sound_spinner.mp3')
+
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
     text_rect = text_obj.get_rect()
@@ -36,7 +39,7 @@ def pokemon_screen():
     player0_numbers = []
     player1_numbers = []
 
-    while toss_count < 3:  # Perform tosses three times
+    while toss_count < 3:
         angle0 = 0
         angle1 = 0
         rotation_speed0 = 1  
@@ -64,7 +67,7 @@ def pokemon_screen():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN and not toss_started0 and not toss_started1:
+                if event.type == pygame.KEYDOWN and not toss_started0 and not toss_started1:
                     toss_started0 = True
                     toss_started1 = True
                     rotation_speed0 = 30
@@ -75,7 +78,7 @@ def pokemon_screen():
                     current_toss1 = random.randint(0, 5)
                     while current_toss1 in player1_numbers:
                         current_toss1 = random.randint(0, 5)
-
+                    spinner_sound.play()         
 
             if toss_started0:
                 angle0 += rotation_speed0
@@ -86,6 +89,7 @@ def pokemon_screen():
                     if spin_duration0 >= 10:  
                         rotation_speed0 = 0
                         toss_result0 = current_toss0
+                        spinner_sound.stop() 
 
                     if spin_duration0 % 15 == 0:   
                         current_toss0 = random.randint(0, 5)
@@ -102,7 +106,8 @@ def pokemon_screen():
                     if spin_duration1 >= 10:  
                         rotation_speed1 = 0
                         toss_result1 = current_toss1
-
+                        spinner_sound.stop()
+                        
                     if spin_duration1 % 15 == 0:  
                         current_toss1 = random.randint(0, 5)
                         while current_toss1 in player1_numbers:
