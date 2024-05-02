@@ -1,6 +1,5 @@
 import pygame
 import sys
-import cv2
 
 pygame.init()
 
@@ -41,18 +40,49 @@ def battle_field_screen(player0_numbers, player1_numbers):
 
     background_image = pygame.image.load('Resources/board_battle_field.jpg')
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
-    
-    while running:
-        window.fill(WHITE)
 
+    player0_image = pygame.image.load('Resources/dashboard_player_0.png')
+    player0_image = pygame.transform.scale(player0_image, (280, 360))
+    player1_image = pygame.image.load('Resources/dashboard_player_1.png')
+    player1_image = pygame.transform.scale(player1_image, (280, 360))
+
+    field_sounds = [
+        pygame.mixer.Sound('Resources/sound_electric.mp3'),
+        pygame.mixer.Sound('Resources/sound_infernal.mp3'),
+        pygame.mixer.Sound('Resources/sound_aquatic.mp3')
+    ]
+
+    while running:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                clicked = False
+                for i, rect in enumerate(button_rects):
+                    if rect.collidepoint(mouse_x, mouse_y):
+                        selected_field = field_options[i]
+                        clicked = True
+                        for j, sound in enumerate(field_sounds):
+                            if j == i:
+                                sound.play()
+                            else:
+                                sound.stop()
+                if not clicked:
+                    selected_field = None
+                    for sound in field_sounds:
+                        sound.stop()
+            elif event.type == pygame.KEYDOWN:  
+                if selected_field is not None: 
+                    for sound in field_sounds:
+                        sound.stop() 
+                    return selected_field
+
+        window.fill(WHITE)
         window.blit(background_image, (0, 0))
 
-        player0_image = pygame.image.load('Resources/dashboard_player_0.png')
-        player0_image = pygame.transform.scale(player0_image, (280, 360))
         window.blit(player0_image, (40, 40))
-
-        player1_image = pygame.image.load('Resources/dashboard_player_1.png')
-        player1_image = pygame.transform.scale(player1_image, (280, 360))
         window.blit(player1_image, (1180, 370))
 
         player_positions = [
@@ -73,18 +103,6 @@ def battle_field_screen(player0_numbers, player1_numbers):
             if selected_field == field:
                 draw_button_border(window, rect, BLACK, 3)
             window.blit(button, rect)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = event.pos
-                for rect, field in zip(button_rects, field_options):
-                    if rect.collidepoint(mouse_x, mouse_y):
-                        selected_field = field
-            elif event.type == pygame.KEYDOWN:    
-                return selected_field
 
         if selected_field:
             draw_text("Selected Field: " + selected_field, font, BLACK, window, WIDTH // 2, HEIGHT // 2 + 160)

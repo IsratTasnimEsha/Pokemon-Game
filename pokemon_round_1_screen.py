@@ -30,6 +30,11 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers, round_1_pokemon0):
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Toss Screen")
 
+    player0_image = pygame.image.load('Resources/dashboard_player_0.png')
+    player0_image = pygame.transform.scale(player0_image, (240, 300))
+    player1_image = pygame.image.load('Resources/dashboard_player_1.png')
+    player1_image = pygame.transform.scale(player1_image, (240, 300))
+
     pokemon_buttons0 = []
     pokemon_buttons1 = []
     for i in range(3):
@@ -59,35 +64,34 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers, round_1_pokemon0):
         pokemon_buttons1.append(pokemon_button)
 
     while True:
-        window.fill(WHITE)
-
-        window.blit(background_image, (0, 0))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    clicked_button = None
                     for button in pokemon_buttons1:
                         if button['rect'].collidepoint(event.pos):
-                            round_1_pokemon1 = button['number']
+                            clicked_button = button
+                            round_1_pokemon = button['number']
                             for b in pokemon_buttons1:
                                 b['color'] = WHITE
                             button['color'] = BLUE
-            elif event.type == pygame.KEYDOWN:    
-                return round_1_pokemon1
-
+                    if clicked_button is None:
+                        round_1_pokemon = None
+                        for b in pokemon_buttons1:
+                            b['color'] = WHITE
+            elif event.type == pygame.KEYDOWN:
+                if round_1_pokemon is not None:   
+                    return round_1_pokemon
+                    
+        window.fill(WHITE)
         window.blit(background_image, (0, 0))
-
+        
         draw_alert_message(window, "Choose the pokemon for round-1 battle", font, WHITE, (0, 0, 0), WIDTH // 2, HEIGHT // 2, 700, 70)
 
-        player0_image = pygame.image.load('Resources/dashboard_player_0.png')
-        player0_image = pygame.transform.scale(player0_image, (240, 300))
         window.blit(player0_image, (177, 160))
-
-        player1_image = pygame.image.load('Resources/dashboard_player_1.png')
-        player1_image = pygame.transform.scale(player1_image, (240, 300))
         window.blit(player1_image, (1090, 160))
 
         for button in pokemon_buttons0:

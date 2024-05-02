@@ -12,8 +12,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 font = pygame.font.SysFont(None, 30)
-
-pygame.mixer.init()
 spinner_sound = pygame.mixer.Sound('Resources/sound_spinner.mp3')
 
 def draw_text(text, font, color, surface, x, y):
@@ -26,18 +24,23 @@ def draw_alert_message(window, message, font, color, bg_color, x, y, width, heig
     pygame.draw.rect(window, bg_color, (x - width // 2, y - height // 2, width, height))
     draw_text(message, font, color, window, x, y)
 
-background_image = pygame.image.load('Resources/board_pokemon.jpg')
-background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
-
-spinner_img0 = pygame.image.load('Resources/spinner_pokemon_0.png')
-spinner_img0 = pygame.transform.scale(spinner_img0, (190, 190))
-spinner_img1 = pygame.image.load('Resources/spinner_pokemon_1.png')
-spinner_img1 = pygame.transform.scale(spinner_img1, (190, 190))
-
 def pokemon_screen():
     toss_count = 0
     player0_numbers = []
     player1_numbers = []
+
+    background_image = pygame.image.load('Resources/board_pokemon.jpg')
+    background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
+
+    player0_image = pygame.image.load('Resources/dashboard_player_0.png')
+    player0_image = pygame.transform.scale(player0_image, (240, 300))
+    player1_image = pygame.image.load('Resources/dashboard_player_1.png')
+    player1_image = pygame.transform.scale(player1_image, (240, 300))
+
+    spinner_img0 = pygame.image.load('Resources/spinner_pokemon_0.png')
+    spinner_img0 = pygame.transform.scale(spinner_img0, (190, 190))
+    spinner_img1 = pygame.image.load('Resources/spinner_pokemon_1.png')
+    spinner_img1 = pygame.transform.scale(spinner_img1, (190, 190))
 
     while toss_count < 3:
         angle0 = 0
@@ -61,8 +64,6 @@ def pokemon_screen():
         clock = pygame.time.Clock()
 
         while True:
-            window.fill(WHITE)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -70,8 +71,8 @@ def pokemon_screen():
                 if event.type == pygame.KEYDOWN and not toss_started0 and not toss_started1:
                     toss_started0 = True
                     toss_started1 = True
-                    rotation_speed0 = 30
-                    rotation_speed1 = 30  
+                    rotation_speed0 = 15
+                    rotation_speed1 = 15 
                     current_toss0 = random.randint(0, 5)
                     while current_toss0 in player0_numbers:
                         current_toss0 = random.randint(0, 5)
@@ -86,7 +87,7 @@ def pokemon_screen():
                 spin_duration0 += 1  
 
                 if rotation_speed0 > 0:
-                    if spin_duration0 >= 10:  
+                    if spin_duration0 >= 50:  
                         rotation_speed0 = 0
                         toss_result0 = current_toss0
                         spinner_sound.stop() 
@@ -94,8 +95,7 @@ def pokemon_screen():
                     if spin_duration0 % 15 == 0:   
                         current_toss0 = random.randint(0, 5)
                         while current_toss0 in player0_numbers:
-                            current_toss0 = random.randint(0, 5)
-                        
+                            current_toss0 = random.randint(0, 5)   
 
             if toss_started1:
                 angle1 += rotation_speed1
@@ -103,7 +103,7 @@ def pokemon_screen():
                 spin_duration1 += 1  
 
                 if rotation_speed1 > 0:
-                    if spin_duration1 >= 10:  
+                    if spin_duration1 >= 50:  
                         rotation_speed1 = 0
                         toss_result1 = current_toss1
                         spinner_sound.stop()
@@ -113,14 +113,10 @@ def pokemon_screen():
                         while current_toss1 in player1_numbers:
                             current_toss1 = random.randint(0, 5)
 
+            window.fill(WHITE)
             window.blit(background_image, (0, 0))
 
-            player0_image = pygame.image.load('Resources/dashboard_player_0.png')
-            player0_image = pygame.transform.scale(player0_image, (240, 300))
             window.blit(player0_image, (177, 160))
-
-            player1_image = pygame.image.load('Resources/dashboard_player_1.png')
-            player1_image = pygame.transform.scale(player1_image, (240, 300))
             window.blit(player1_image, (1090, 160))
 
             pokemon_image0 = []
@@ -189,7 +185,7 @@ def pokemon_screen():
                 
         toss_count += 1
 
-    pygame.time.delay(4000)
+    pygame.time.delay(2000)
     return player0_numbers, player1_numbers
 
 #player0_numbers, player1_numbers = pokemon_screen()
