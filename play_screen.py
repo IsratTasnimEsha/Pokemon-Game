@@ -139,13 +139,13 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
 
     #-------------------------------------------------------Pokemon Fighting Images-------------------------------------------------------
     pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon0}_fight_0.png')
-    if round_1_pokemon0 < 3:
+    if round_1_pokemon0 >= 3:
         pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
     else:
         pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (260, 300))
 
     pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon1}_fight_1.png')
-    if round_1_pokemon1 < 3:
+    if round_1_pokemon1 >= 3:
         pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
     else:
         pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (260, 300))
@@ -280,12 +280,12 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
                 window.blit(pokemon_button_image_copy, (pokemon_choose_button_x1[i], pokemon_choose_button_y1))
 
         #-------------------------------------------------------Pokemon Fighting-------------------------------------------------------
-        if round_1_pokemon0 < 3:
+        if round_1_pokemon0 >= 3:
             window.blit(pokemon_fight_image0, (265, 305))
         else:
             window.blit(pokemon_fight_image0, (265, 305-75))
 
-        if round_1_pokemon1 < 3:
+        if round_1_pokemon1 >= 3:
             window.blit(pokemon_fight_image1, (WIDTH-395, 305))
         else:
             window.blit(pokemon_fight_image1,  (WIDTH-395-130, 305-75))
@@ -308,4 +308,4 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
 
         pygame.display.flip()
 
-#play_screen('Team_Rocket', random.choice(["Electric Field", "Infernal Field", "Aquatic Field"]), [3, 4, 2], [0, 3, 5], None, 5, None, None)
+play_screen('Team_Rocket', random.choice(["Electric Field", "Infernal Field", "Aquatic Field"]), [2, 3, 4], [0, 3, 5], None, 0, None, None)
