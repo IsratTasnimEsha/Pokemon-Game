@@ -42,5 +42,5 @@ if toss_result == 'Team Rocket':
 elif toss_result == 'Me(Ash)':
     selected_field = battle_field_screen(player_0_pokemon_indices, player_1_pokemon_indices)
 
-#round_1_pokemon1 = pokemon_round_1_screen(player_0_pokemon_indices, player_1_pokemon_indices, round_1_pokemon0)
-#play_screen(toss_result, selected_field, player_0_pokemon_indices, player_1_pokemon_indices, round_1_pokemon0, round_1_pokemon1, round_2_pokemon0, round_2_pokemon1)
+round_1_pokemon1 = pokemon_round_1_screen(player_0_pokemon_indices, player_1_pokemon_indices, round_1_pokemon0)
+play_screen(toss_result, selected_field, player_0_pokemon_indices, player_1_pokemon_indices, round_1_pokemon0, round_1_pokemon1, round_2_pokemon0, round_2_pokemon1)

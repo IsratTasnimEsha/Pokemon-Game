@@ -72,8 +72,8 @@ def pokemon_find_screen():
 
     # Define positions for players and pokemons
     positions = [
-        (280, 210), (640, 185), (831, 192), (1165, 230), (410, 390), (627, 380),
-        (823, 382), (1020, 384), (287, 572), (623, 569), (825, 570), (1160, 580)
+        (305, 220), (660, 198), (850, 202), (1175, 235), (435, 374), (650, 364),
+        (838, 369), (1032, 370), (314, 531), (641, 526), (841, 528), (1170, 537)
     ]
 
     random_numbers = random.sample(range(12), 8)
@@ -131,7 +131,7 @@ def pokemon_find_screen():
     path_counter = 0
 
     # Timestamp for player 0's next move
-    player_0_next_move_time = 500  # Delay for Player 0's movement
+    player_0_next_move_time = 100  # Delay for Player 0's movement
 
     # Game loop
     while True:
@@ -247,6 +247,15 @@ def pokemon_find_screen():
         window.blit(player0_image, (662, 25))
         window.blit(player1_image, (760, 25))
 
+        ######################################################### Define positions for players and pokemons
+
+        #player_image = pygame.image.load('Resources/board_toss.jpg')
+        #player_image = pygame.transform.scale(player_image, (70, 70))
+        #window.blit(player_image, (1170, 537))
+        #, , , , 
+        #
+########################################################
+
         pygame.display.flip()
 
         # Check if all 6 pokemons are caught
@@ -255,9 +264,8 @@ def pokemon_find_screen():
             return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs
 
 # Run the main function and get the result
-#player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs = pokemon_find_screen()
-
-#print("Player 0 Pokemon Indices:", player_0_pokemon_indices)
-#print("Player 1 Pokemon Indices:", player_1_pokemon_indices)
-#print("Player 0 Costs:", player_0_costs)
-#print("Player 1 Costs:", player_1_costs)
+player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs = pokemon_find_screen()
+print("Player 0 Pokemon Indices:", player_0_pokemon_indices)
+print("Player 1 Pokemon Indices:", player_1_pokemon_indices)
+print("Player 0 Costs:", player_0_costs)
+print("Player 1 Costs:", player_1_costs)
