@@ -12,11 +12,15 @@ WINDOW_SIZE = (WIDTH, HEIGHT)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0) 
+BLUE = (0, 0, 255)
+TRANSPARENT = (255, 255, 255, 50)
 
 # Font initialization for displaying text
-font = pygame.font.SysFont(None, 50)
-font2 = pygame.font.SysFont(None, 30)
+font = pygame.font.SysFont("comicsansms", 25)
 
+catched_0 = []
+catched_1 = []
 player_0_pokemon_indices = []
 player_1_pokemon_indices = []
 
@@ -25,9 +29,9 @@ player_0_costs = [0, 0, 0]  # Initialize with zeros
 player_1_costs = [0, 0, 0]  # Initialize with zeros
 
 player0_image = pygame.image.load('Resources/dashboard_player_0.png')
-player0_image = pygame.transform.scale(player0_image, (80, 80))
+player0_image = pygame.transform.scale(player0_image, (150, 150))
 player1_image = pygame.image.load('Resources/dashboard_player_1.png')
-player1_image = pygame.transform.scale(player1_image, (80, 80))
+player1_image = pygame.transform.scale(player1_image, (150, 150))
 
 # Helper function to draw text on screen
 def draw_text(text, font, color, surface, x, y):
@@ -35,6 +39,23 @@ def draw_text(text, font, color, surface, x, y):
     text_rect = text_obj.get_rect()
     text_rect.center = (x, y)
     surface.blit(text_obj, text_rect)
+
+def draw_text_with_outline(text, font, text_color, outline_color, surface, x, y):
+    # Render the outline text
+    outline_text = font.render(text, True, outline_color)
+    outline_rect = outline_text.get_rect(center=(x, y))
+
+    # Render the main text
+    main_text = font.render(text, True, text_color)
+    main_rect = main_text.get_rect(center=(x, y))
+
+    # Draw the outline by offsetting the text
+    offsets = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+    for offset in offsets:
+        surface.blit(outline_text, (outline_rect.x + offset[0], outline_rect.y + offset[1]))
+
+    # Draw the main text on top
+    surface.blit(main_text, main_rect)
 
 # A* algorithm function to find the shortest path
 def astar(adjacency_list, start, goal):
@@ -61,7 +82,7 @@ def astar(adjacency_list, start, goal):
 
 # Main function for the Pokemon field screen
 def pokemon_find_screen():
-    global player_0_costs, player_1_costs, player_0_pokemon_indices, player_1_pokemon_indices
+    global player_0_costs, player_1_costs, player_0_pokemon_indices, player_1_pokemon_indices, winner
 
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Pokemon Field Screen")
@@ -69,6 +90,10 @@ def pokemon_find_screen():
     # Load and scale background image
     background_image = pygame.image.load('Resources/board_pokemon_find.png')
     background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
+
+    # Timer variables
+    start_time = pygame.time.get_ticks()  # Get current time in milliseconds
+    elapsed_time = 0  # Variable to store elapsed time
 
     # Define positions for players and pokemons
     positions = [
@@ -80,23 +105,27 @@ def pokemon_find_screen():
 
     pokemon_positions = [positions[random_numbers[0]], positions[random_numbers[1]], positions[random_numbers[2]],
                          positions[random_numbers[3]], positions[random_numbers[4]], positions[random_numbers[5]]]
+
+    pokemon_positions_original = [positions[random_numbers[0]], positions[random_numbers[1]], positions[random_numbers[2]],
+                         positions[random_numbers[3]], positions[random_numbers[4]], positions[random_numbers[5]]]
+
     player_0_position = positions[random_numbers[6]]
     player_1_position = positions[random_numbers[7]]
 
     # Adjacency list representation of the graph
     adjacency_list = {
-        0: [(4, 3), (8, 4), (5, 2)], 
-        1: [(2, 5), (5, 3), (6, 2), (4, 4)], 
-        2: [(1, 5), (3, 4), (6, 2)], 
-        3: [(2, 4), (6, 5), (7, 2)], 
-        4: [(0, 3), (1, 4), (5, 1), (8, 3), (9, 2)], 
-        5: [(0, 2), (1, 3), (4, 1), (6, 2), (9, 3), (10, 5)], 
-        6: [(1, 2), (2, 2), (3, 5), (5, 2), (7, 3), (9, 4), (10, 2), (11, 3)], 
-        7: [(3, 2), (6, 3), (10, 1), (11, 4)], 
-        8: [(0, 4), (4, 3)], 
-        9: [(4, 2), (5, 3), (6, 4)], 
-        10: [(5, 5), (6, 2), (7, 1), (11, 1)], 
-        11: [(6, 3), (7, 4), (10, 1)]
+        0: [(4, 2), (5, 5)], 
+        1: [(2, 1), (4, 3), (5, 1), (6, 3)], 
+        2: [(1, 1), (6, 1), (3, 4)], 
+        3: [(2, 4), (6, 4), (7, 2), (11, 5)], 
+        4: [(0, 2), (1, 3), (8, 2), (9, 3)], 
+        5: [(0, 5), (1, 1), (8, 5), (9, 1), (10, 2)], 
+        6: [(1,3), (2, 1), (3, 4), (9, 2), (10, 1), (11, 5)], 
+        7: [(3, 2), (10, 3)], 
+        8: [(4, 2), (5, 5)], 
+        9: [(4, 3), (5, 1), (6, 2)], 
+        10: [(5, 2), (6, 1), (7, 3)], 
+        11: [(3, 5), (6, 5)]
     }
 
     # Start node for player 1
@@ -114,9 +143,6 @@ def pokemon_find_screen():
     current_target_index = get_next_target()
     path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index]) if current_target_index is not None else []
 
-    #if path_to_pokemon:
-    #    print("Shortest path found:", path_to_pokemon)
-
     # Boolean to track if space was pressed
     space_pressed = False
 
@@ -127,11 +153,16 @@ def pokemon_find_screen():
                 return index
         return None
 
+    def make_shade(image, image_color = None):
+        if image_color != None:
+            image.fill(image_color, None, pygame.BLEND_RGBA_MULT)
+        return image
+
     # Counter for traversing the path
     path_counter = 0
 
     # Timestamp for player 0's next move
-    player_0_next_move_time = 100  # Delay for Player 0's movement
+    player_0_next_move_time = 60  # Delay for Player 0's movement
 
     # Game loop
     while True:
@@ -157,12 +188,11 @@ def pokemon_find_screen():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and not space_pressed:
                     space_pressed = True
-                    # Check if Player 1's node overlaps with any Pokemon's position
-                    for j, pokemon_pos in enumerate(pokemon_positions):
-                        if pokemon_pos is not None and positions[player_1_node] == pokemon_pos:
-                            # Display the Pokemon index (j) on the screen
-                            pokemon_positions[j] = None
-                            player_1_pokemon_indices.append(j)
+                    for i in range(3):
+                        if len(catched_1) == i and positions[player_1_node] == pokemon_positions[i+3]:
+                            catched_1.append(pokemon_positions[i+3])
+                            pokemon_positions[i+3] = None
+                            player_1_pokemon_indices.append(i+3)
 
         window.fill(WHITE)
         window.blit(background_image, (0, 0))
@@ -176,6 +206,21 @@ def pokemon_find_screen():
             pygame.transform.scale(pygame.image.load('Resources/pokemon_4.png'), (70, 70)),
             pygame.transform.scale(pygame.image.load('Resources/pokemon_5.png'), (70, 70))
         ]
+
+        pokemon_images_original = [
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_0.png'), (70, 70)),
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_1.png'), (70, 70)),
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_2.png'), (70, 70)),
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_3.png'), (70, 70)),
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_4.png'), (70, 70)),
+            pygame.transform.scale(pygame.image.load('Resources/pokemon_5.png'), (70, 70))
+        ]
+
+        pokemon_images[1] = make_shade(pokemon_images[1], TRANSPARENT)
+        pokemon_images[2] = make_shade(pokemon_images[2], TRANSPARENT)
+
+        pokemon_images[4] = make_shade(pokemon_images[4], TRANSPARENT)
+        pokemon_images[5] = make_shade(pokemon_images[5], TRANSPARENT)
 
         for j, (img, pos) in enumerate(zip(pokemon_images, pokemon_positions)):
             if pos is not None:
@@ -208,6 +253,7 @@ def pokemon_find_screen():
                 for j, pokemon_pos in enumerate(pokemon_positions):
                     if pokemon_pos is not None and positions[player_0_node] == pokemon_pos:
                         # Player 0 catches the Pokemon
+                        catched_0.append(pokemon_positions[j])
                         pokemon_positions[j] = None
                         player_0_pokemon_indices.append(j)
                         
@@ -224,48 +270,122 @@ def pokemon_find_screen():
         window.blit(player_image_1, positions[player_1_node])
 
         if len(player_0_pokemon_indices) == 1:
-            window.blit(pokemon_images[player_0_pokemon_indices[0]], (80, 20))
+            pokemon_images[0] = make_shade(pokemon_images[0], RED)
+            window.blit(pokemon_images[0], catched_0[0])
+            pokemon_images[1] = pokemon_images_original[1]
+            window.blit(pokemon_images[1], pokemon_positions[1])
+
         elif len(player_0_pokemon_indices) == 2:
-            window.blit(pokemon_images[player_0_pokemon_indices[0]], (80, 20))
-            window.blit(pokemon_images[player_0_pokemon_indices[1]], (275, 20))
+            pokemon_images[0] = make_shade(pokemon_images[0], RED)
+            window.blit(pokemon_images[0], catched_0[0])
+            pokemon_images[1] = pokemon_images_original[1]
+            window.blit(pokemon_images[1], pokemon_positions_original[1])
+
+            pokemon_images[1] = make_shade(pokemon_images[1], RED)
+            window.blit(pokemon_images[1], catched_0[1])
+            pokemon_images[2] = pokemon_images_original[2]
+            window.blit(pokemon_images[2], pokemon_positions[2])
+
         elif len(player_0_pokemon_indices) == 3:
-            window.blit(pokemon_images[player_0_pokemon_indices[0]], (80, 20))
-            window.blit(pokemon_images[player_0_pokemon_indices[1]], (275, 20))
-            window.blit(pokemon_images[player_0_pokemon_indices[2]], (470, 20))
+            pokemon_images[0] = make_shade(pokemon_images[0], RED)
+            window.blit(pokemon_images[0], catched_0[0])
+            pokemon_images[1] = pokemon_images_original[1]
+            window.blit(pokemon_images[1], pokemon_positions_original[1])
+
+            pokemon_images[1] = make_shade(pokemon_images[1], RED)
+            window.blit(pokemon_images[1], catched_0[1])
+            pokemon_images[2] = pokemon_images_original[2]
+            window.blit(pokemon_images[2], pokemon_positions_original[2])
+
+            pokemon_images[2] = make_shade(pokemon_images[2], RED)
+            window.blit(pokemon_images[2], catched_0[2])
 
         # Display caught pokemons for player 1
         if len(player_1_pokemon_indices) == 1:
-            window.blit(pokemon_images[player_1_pokemon_indices[0]], (950, 20))
+            pokemon_images[3] = make_shade(pokemon_images[3], BLUE)
+            window.blit(pokemon_images[3], catched_1[0])
+            pokemon_images[4] = pokemon_images_original[4]
+            window.blit(pokemon_images[4], pokemon_positions[4])
+
         elif len(player_1_pokemon_indices) == 2:
-            window.blit(pokemon_images[player_1_pokemon_indices[0]], (950, 20))
-            window.blit(pokemon_images[player_1_pokemon_indices[1]], (1145, 20))
+            pokemon_images[3] = make_shade(pokemon_images[3], BLUE)
+            window.blit(pokemon_images[3], catched_1[0])
+            pokemon_images[4] = pokemon_images_original[4]
+            window.blit(pokemon_images[4], pokemon_positions_original[4])
+
+            pokemon_images[4] = make_shade(pokemon_images[4], BLUE)
+            window.blit(pokemon_images[4], catched_1[1])
+            pokemon_images[5] = pokemon_images_original[5]
+            window.blit(pokemon_images[5], pokemon_positions_original[5])
+
         elif len(player_1_pokemon_indices) == 3:
-            window.blit(pokemon_images[player_1_pokemon_indices[0]], (950, 20))
-            window.blit(pokemon_images[player_1_pokemon_indices[1]], (1145, 20))
-            window.blit(pokemon_images[player_1_pokemon_indices[2]], (1340, 20))
+            pokemon_images[3] = make_shade(pokemon_images[3], BLUE)
+            window.blit(pokemon_images[3], catched_1[0])
+            pokemon_images[4] = pokemon_images_original[4]
+            window.blit(pokemon_images[4], pokemon_positions_original[4])
 
-        window.blit(player0_image, (662, 25))
-        window.blit(player1_image, (760, 25))
+            pokemon_images[4] = make_shade(pokemon_images[4], BLUE)
+            window.blit(pokemon_images[4], catched_1[1])
+            pokemon_images[5] = pokemon_images_original[5]
+            window.blit(pokemon_images[5], pokemon_positions_original[5])
 
-        ######################################################### Define positions for players and pokemons
+            pokemon_images[5] = make_shade(pokemon_images[5], BLUE)
+            window.blit(pokemon_images[5], catched_1[2])
 
-        #player_image = pygame.image.load('Resources/board_toss.jpg')
-        #player_image = pygame.transform.scale(player_image, (70, 70))
-        #window.blit(player_image, (1170, 537))
-        #, , , , 
-        #
-########################################################
+        window.blit(player0_image, (55, 255))
+        window.blit(player1_image, (1298, 255))
+
+        # Draw costs for Player 0
+        for i, cost in enumerate(player_0_costs):
+            if cost > 15:
+                return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Me(Ash)"
+            if (15-cost) > 5:
+                draw_text_with_outline(f"Remaining {i+1}: {15-cost}", font, WHITE, BLACK, window, 127, 432 + i * 35)
+            else:
+                draw_text_with_outline(f"Remaining {i+1}: {15-cost}", font, RED, BLACK, window, 127, 432 + i * 35)
+
+        # Draw costs for Player 1
+        for i, cost in enumerate(player_1_costs):
+            if cost > 15:
+                return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Team Rocket"
+            if (15-cost) > 5:
+                draw_text_with_outline(f"Remaining {i+1}: {15-cost}", font, WHITE, BLACK, window, 1375, 432 + i * 35)
+            else:
+                draw_text_with_outline(f"Remaining {i+1}: {15-cost}", font, RED, BLACK, window, 1375, 432 + i * 35)
+
+        # Calculate elapsed time
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
+
+        # Convert milliseconds to seconds and format
+        seconds = elapsed_time // 1000
+
+        if (40-seconds) > 10:
+            draw_text_with_outline(f"Time Remaining: {40-seconds} seconds", font, WHITE, BLACK, window, 1300, 720)
+        else:
+            draw_text_with_outline(f"Time Remaining: {40-seconds} seconds", font, RED, BLACK, window, 1300, 720)
+
+        pygame.display.flip()
+
+        # Check if 30 seconds have elapsed
+        if seconds >= 40:
+            if len(player_0_pokemon_indices) != 3:
+                return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Me(Ash)"
+            elif len(player_1_pokemon_indices) != 3:
+                return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Team Rocket"
+            else:
+                return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Draw"
 
         pygame.display.flip()
 
         # Check if all 6 pokemons are caught
         if len(player_0_pokemon_indices) + len(player_1_pokemon_indices) == 6:
             pygame.time.wait(2000)  # Wait for 2000ms
-            return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs
+            return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, None
 
 # Run the main function and get the result
-player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs = pokemon_find_screen()
-print("Player 0 Pokemon Indices:", player_0_pokemon_indices)
-print("Player 1 Pokemon Indices:", player_1_pokemon_indices)
-print("Player 0 Costs:", player_0_costs)
-print("Player 1 Costs:", player_1_costs)
+#player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, winner = pokemon_find_screen()
+#print("Player 0 Pokemon Indices:", player_0_pokemon_indices)
+#print("Player 1 Pokemon Indices:", player_1_pokemon_indices)
+#print("Player 0 Costs:", player_0_costs)
+#print("Player 1 Costs:", player_1_costs)

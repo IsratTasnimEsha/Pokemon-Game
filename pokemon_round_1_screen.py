@@ -11,7 +11,7 @@ BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 
-font = pygame.font.SysFont(None, 50)
+font = pygame.font.SysFont("comicsansms", 25)
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
