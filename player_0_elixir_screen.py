@@ -179,6 +179,7 @@ def player_0_elixir_screen(elixir_price_power, remaining):
             if best_solution[i] == 1:
                 window.blit(owned_images[i], elixir_positions[i])
                 remaining -= elixir_price_power[i][0]
+                player0_best_elixirs[i] = elixir_price_power[i][1]
                 sum_of_power += elixir_price_power[i][1]
         
         draw_text_with_outline(f"Remaining:", font2, WHITE, BLACK, window, 1270, 330)
@@ -203,4 +204,4 @@ def player_0_elixir_screen(elixir_price_power, remaining):
         pygame.time.wait(2000)  # Wait for 2000ms
         return elixir_price_power, remaining, player0_best_elixirs
 
-#player_0_elixir_screen([(9, 3), (9, 15), (7, 18), (10, 17), (3, 11)], 19)
+#print(player_0_elixir_screen([(9, 3), (9, 15), (7, 18), (10, 17), (3, 11)], 19))

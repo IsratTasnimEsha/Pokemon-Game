@@ -162,7 +162,7 @@ def pokemon_find_screen():
     path_counter = 0
 
     # Timestamp for player 0's next move
-    player_0_next_move_time = 60  # Delay for Player 0's movement
+    player_0_next_move_time = 0  # Delay for Player 0's movement
 
     # Game loop
     while True:
@@ -264,7 +264,7 @@ def pokemon_find_screen():
                             path_counter = 0
                         break
             
-            player_0_next_move_time = current_time + 2500  # Set next move time for Player 0
+            player_0_next_move_time = current_time + 1500  # Set next move time for Player 0
 
         window.blit(player_image_0, positions[player_0_node])
         window.blit(player_image_1, positions[player_1_node])

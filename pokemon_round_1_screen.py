@@ -25,7 +25,7 @@ def draw_alert_message(window, message, font, color, bg_color, x, y, width, heig
 background_image = pygame.image.load('Resources/board_pokemon.jpg')
 background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
-def pokemon_round_1_screen(player0_numbers, player1_numbers, round_1_pokemon0):
+def pokemon_round_1_screen(player0_numbers, player1_numbers):
 
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Toss Screen")
@@ -37,21 +37,13 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers, round_1_pokemon0):
 
     pokemon_buttons0 = []
     pokemon_buttons1 = []
-    for i in range(3):
-        if player0_numbers[i] == round_1_pokemon0:
-                pokemon_button = {
-                'number': player0_numbers[i],
-                'rect': pygame.Rect(115 + i * 125, 480, 105, 105),
-                'image': pygame.image.load(f'Resources/pokemon_{player0_numbers[i]}.png'),
-                'color': RED
-            }
-        else:
-            pokemon_button = {
-                'number': player0_numbers[i],
-                'rect': pygame.Rect(115 + i * 125, 480, 105, 105),
-                'image': pygame.image.load(f'Resources/pokemon_{player0_numbers[i]}.png'),
-                'color': WHITE
-            }
+    for i in range(3): 
+        pokemon_button = {
+            'number': player0_numbers[i],
+            'rect': pygame.Rect(115 + i * 125, 480, 105, 105),
+            'image': pygame.image.load(f'Resources/pokemon_{player0_numbers[i]}.png'),
+            'color': WHITE
+        }
         pokemon_buttons0.append(pokemon_button)
 
     for i in range(3):
@@ -110,4 +102,4 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers, round_1_pokemon0):
 
         pygame.display.flip()
 
-#print("round_1_pokemon1", pokemon_round_1_screen([5, 0, 4], [1, 3, 2], 4))
+#print("round_1_pokemon1", pokemon_round_1_screen([5, 0, 4], [1, 3, 2]))

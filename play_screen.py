@@ -2,9 +2,18 @@ import pygame
 import random
 import time
 import sys
-import pokemon_swap_ai
+from fuzzy_logic_decision import find_best_pokemon_index
 
 pygame.init()
+timer = 0
+clock = pygame.time.Clock()
+timer += clock.get_rawtime()
+clock.tick()
+moves = 0
+
+# Constants
+WIDTH, HEIGHT = 1500, 770
+WINDOW_SIZE = (WIDTH, HEIGHT)
 
 # Define colors and font
 WHITE = (255, 255, 255)
@@ -13,108 +22,86 @@ GRAY = (200, 200, 200)
 BLUE = (0, 0, 255, 128)
 RED = (255, 0, 0, 128)
 
-font = pygame.font.SysFont(None, 20)
-
-WIDTH, HEIGHT = 1500, 770
-WINDOW_SIZE = (WIDTH, HEIGHT)
-
-window = pygame.display.set_mode(WINDOW_SIZE)
-pygame.display.set_caption("Pokemon Battle")
+font = pygame.font.SysFont("comicsansms", 15)
 
 # Simplified Pokémon data structure
-pokemon_data = {
-    0: {"name": "Pikachu", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Electric"},
-    1: {"name": "Charmander", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Fire"},
-    2: {"name": "Squirtle", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Water"},
-    3: {"name": "Raichu", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Electric"},
-    4: {"name": "Charizard", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Fire"},
-    5: {"name": "Blastoise", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Water"},
-    6: {"name": "Meowth", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Electric"},
-    7: {"name": "Wobbuffet", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Fire"},
-    8: {"name": "Weezing", "health": 100, "attacks": ["Attack", "Defense", "Elixir"], "type": "Water"}
+pokemon_data0 = {
+    0: {"name": "Pikachu", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
+    1: {"name": "Charmander", "health": 100, "attacks": ["Attack", "Defense"], "type": "Fire"},
+    2: {"name": "Squirtle", "health": 100, "attacks": ["Attack", "Defense"], "type": "Water"},
 }
 
-def evaluate_game_state(game_state):
-    player0_healths, player1_healths, _, _, _ = game_state
-    player0_score = sum(player0_healths)
-    player1_score = sum(player1_healths)
-    return player1_score - player0_score  # Positive if good for computer, negative if good for player
+pokemon_data1 = {
+    0: {"name": "Meowth", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
+    1: {"name": "Wobbuffet", "health": 100, "attacks": ["Attack", "Defense"], "type": "Fire"},
+    2: {"name": "Weezing", "health": 100, "attacks": ["Attack", "Defense"], "type": "Water"}
+}
 
-def minimax(game_state, depth, alpha, beta, maximizing_player, defense_left, elixir_used, field_type_value):
-    if depth == 0 or game_over(game_state):
-        return evaluate_game_state(game_state), None
 
-    player0_healths, player1_healths, player_turn, current_pokemon_index0, current_pokemon_index1 = game_state
+# Define the mappings for field names to indices
 
-    if maximizing_player:
-        max_eval = float('-inf')
-        best_move = None
-        possible_moves = get_possible_moves(player1_healths[current_pokemon_index1], defense_left[1], elixir_used[1])
 
-        for move in possible_moves:
-            new_game_state = simulate_move(game_state, move, maximizing_player, defense_left, elixir_used, field_type_value)
-            eval, _ = minimax(new_game_state, depth - 1, alpha, beta, False, defense_left, elixir_used, field_type_value)
-            if eval > max_eval:
-                max_eval = eval
-                best_move = move
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break
-        return max_eval, best_move
-    else:
-        min_eval = float('inf')
-        best_move = None
-        possible_moves = get_possible_moves(player0_healths[current_pokemon_index0], defense_left[0], elixir_used[0])
+def get_score(current_field_index, player0_current_pokemon_index, player1_current_pokemon_index):
+    # Define the mappings for each field
+    field_scores = {
+        0: {
+            (0, 0): 5-5, (0, 1): 5-3, (0, 2): 8-0,
+            (1, 0): 3-5, (1, 1): 0-0, (1, 2): 0-5,
+            (2, 0): 0-8, (2, 1): 3-0, (2, 2): 0-0
+        },
+        1: {
+            (0, 0): 0-0, (0, 1): 0-8, (0, 2): 3-0,
+            (1, 0): 8-0, (1, 1): 5-5, (1, 2): 5-3,
+            (2, 0): 0-3, (2, 1): 3-5, (2, 2): 0-0
+        },
+        2: {
+            (0, 0): 0-0, (0, 1): 0-3, (0, 2): 3-5,
+            (1, 0): 3-0, (1, 1): 0-0, (1, 2): 0-8,
+            (2, 0): 5-3, (2, 1): 8-0, (2, 2): 5-5
+        }
+    }
 
-        for move in possible_moves:
-            new_game_state = simulate_move(game_state, move, maximizing_player, defense_left, elixir_used, field_type_value)
-            eval, _ = minimax(new_game_state, depth - 1, alpha, beta, True, defense_left, elixir_used, field_type_value)
-            if eval < min_eval:
-                min_eval = eval
-                best_move = move
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break
-        return min_eval, best_move
+    # Get the score based on the current field and Pokémon indices
+    return field_scores.get(current_field_index, {}).get((player0_current_pokemon_index, player1_current_pokemon_index), None)
 
-def get_possible_moves(current_health, defense_left, elixir_left):
-    moves = ["Attack"]
-    if defense_left > 0:
-        moves.append("Defense")
-    if elixir_left >= 5:
-        moves.append("Elixir")
-    return moves
-
-def simulate_move(game_state, move, maximizing_player, defense_left, elixir_used, field_type_value):
-    player0_healths, player1_healths, player_turn, current_pokemon_index0, current_pokemon_index1 = game_state
-    new_player0_healths = player0_healths[:]
-    new_player1_healths = player1_healths[:]
+def minimax(current_field_index, player0_current_pokemon_index, player1_current_pokemon_index, depth, is_maximizing_player):
+    score = get_score(current_field_index, player0_current_pokemon_index, player1_current_pokemon_index)
+    if score is not None:
+        return score
     
-    if maximizing_player:
-        if move == "Attack":
-            damage = attack_damage(pokemon_data[current_pokemon_index1]['type'], pokemon_data[current_pokemon_index0]['type'], field_type_value) + 10  # Increased attack damage
-            new_player0_healths[current_pokemon_index0] -= damage
-        elif move == "Defense":
-            new_player1_healths[current_pokemon_index1] -= 5  # Reduced self-damage for defense
-            defense_left[1] -= 1
-        elif move == "Elixir":
-            new_player1_healths[current_pokemon_index1] = min(100, new_player1_healths[current_pokemon_index1] + 30)
-            elixir_used[1] -= 5
+    if is_maximizing_player:
+        best_score = float('-inf')
+        for p0_index in range(3):
+            for p1_index in range(3):
+                if (p0_index, p1_index) != (player0_current_pokemon_index, player1_current_pokemon_index):
+                    current_score = minimax(current_field_index, p0_index, p1_index, depth + 1, False)
+                    best_score = max(best_score, current_score)
+        return best_score
     else:
-        if move == "Attack":
-            damage = attack_damage(pokemon_data[current_pokemon_index0]['type'], pokemon_data[current_pokemon_index1]['type'], field_type_value)
-            new_player1_healths[current_pokemon_index1] -= damage
-        elif move == "Defense":
-            new_player0_healths[current_pokemon_index0] -= 10  # Increased self-damage for defense
-            defense_left[0] -= 1
-        elif move == "Elixir":
-            new_player0_healths[current_pokemon_index0] = min(100, new_player0_healths[current_pokemon_index0] + 30)
-            elixir_used[0] -= 5
-    
-    return new_player0_healths, new_player1_healths, not player_turn, current_pokemon_index0, current_pokemon_index1
+        best_score = float('inf')
+        for p0_index in range(3):
+            for p1_index in range(3):
+                if (p0_index, p1_index) != (player0_current_pokemon_index, player1_current_pokemon_index):
+                    current_score = minimax(current_field_index, p0_index, p1_index, depth + 1, True)
+                    best_score = min(best_score, current_score)
+        return best_score
+
+def choose_action(current_field_index, player0_current_pokemon_index, player1_current_pokemon_index):
+    if current_field_index == 'electric':
+        current_field_index = 0
+    if current_field_index == 'fire':
+        current_field_index = 1
+    if current_field_index == 'water':
+        current_field_index = 2
+    score = minimax(current_field_index, player0_current_pokemon_index, player1_current_pokemon_index, 0, True)
+    if score >= 0:
+        return 'attack'
+    else:
+        return 'defend'
+
 
 def game_over(game_state):
-    player0_healths, player1_healths, _, _, _ = game_state
+    player0_healths, player1_healths, _, _, _, _ = game_state
     return all(hp <= 0 for hp in player0_healths) or all(hp <= 0 for hp in player1_healths)
 
 def generate_random_positions(num_images, existing_positions):
@@ -134,12 +121,12 @@ def draw_field_images(field_image, window, positions):
     for x, y in positions:
         window.blit(field_image, (x, y))
 
-attack_choose_button_x_start0 = 20
-attack_choose_button_y_start0 = 600
+attack_choose_button_x_start0 = -80
+attack_choose_button_y_start0 = 680
 
 # Adjusted position to fit within the screen
-attack_choose_button_x_start1 = 1060 
-attack_choose_button_y_start1 = 600
+attack_choose_button_x_start1 = 1260 
+attack_choose_button_y_start1 = 680
 
 attack_choose_button_width, attack_choose_button_height = 100, 50
 attack_choose_button_spacing = 5
@@ -171,8 +158,8 @@ def draw_health_bar(window, health, max_health, x, y, width, height):
     pygame.draw.rect(window, BLUE, (x, y, health_bar_width, height))
 
 def attack_damage(attacker_type, defender_type, field_type):
-    base_damage = 20
-    field_bonus = 5 if attacker_type == field_type else 0
+    base_damage = 10
+    field_bonus = 3 if attacker_type == field_type else 0
     type_bonus = 0
 
     if (attacker_type == "Electric" and defender_type == "Water") or \
@@ -182,27 +169,20 @@ def attack_damage(attacker_type, defender_type, field_type):
 
     return base_damage + field_bonus + type_bonus
 
-def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, round_1_pokemon0, round_1_pokemon1, round_2_pokemon0, round_2_pokemon1):
+def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir0, elixir1):
+    global timer, moves
+
+    window = pygame.display.set_mode(WINDOW_SIZE)
+    pygame.display.set_caption("Play Screen")
+
     current_attack_choose_button_clicked0 = None
     current_attack_choose_button_clicked1 = None
-    player_turn = True if toss_result == "Me(Ash)" else False
-    defense_used0 = 0
-    defense_used1 = 0
-    defense_max = 4
-    elixir_used0 = 15  # Added initial elixir value for player 0
-    elixir_used1 = 15  # Added initial elixir value for player 1
-
-    split_words = selected_field.lower().split(" ")
-    field_sound = pygame.mixer.Sound(f'Resources/sound_{split_words[0]}.mp3')
+    player_turn = False
 
     # Initial health for each Pokémon
     max_health = 100
     player0_healths = [max_health] * 3
     player1_healths = [max_health] * 3
-
-    # Current Pokémon indexes
-    current_pokemon_index0 = 0
-    current_pokemon_index1 = 0
 
     # Field type mapping
     field_type_mapping = {
@@ -210,42 +190,34 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
         "Infernal Field": "Fire",
         "Aquatic Field": "Water"
     }
-
-    field_type_value = field_type_mapping.get(selected_field, "Electric")  # Default to Electric if field type not found
-
-    #-------------------------------------------------------Pokemon Selection-------------------------------------------------------     
-    if round_1_pokemon0 == None:
-        round_1_pokemon0 = player0_numbers[0]
-
+    
     #-------------------------------------------------------Background Images-------------------------------------------------------
     background_images = [
-        pygame.image.load('Resources/water.png'),
         pygame.image.load('Resources/electric1.png'),
-        pygame.image.load('Resources/fire2.png')
+        pygame.image.load('Resources/fire2.png'),
+        pygame.image.load('Resources/water.png')        
     ]
-    for i in range(3):
-        background_images[i] = pygame.transform.scale(background_images[i], (WIDTH, HEIGHT))
-
+    background_images = [pygame.transform.scale(image, (WIDTH, HEIGHT)) for image in background_images]
     background_image_index = 0
     last_background_change_time = pygame.time.get_ticks()
 
+    show_field = False
+    positions = []
+
+    last_attack_time = 0
+    computer_action_text = ""
+
+    draw_field_images(background_images[0], window, positions)
+    field_type_value = 'electric'
+        
+    current_pokemon_index0 = find_best_pokemon_index(0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
+
     #-------------------------------------------------------Players Images-------------------------------------------------------
     player0_image = pygame.image.load('Resources/player_0.png')
-    player0_image = pygame.transform.scale(player0_image, (200, 300))
+    player0_image = pygame.transform.scale(player0_image, (250, 400))
 
     player1_image = pygame.image.load('Resources/player_1.png')
-    player1_image = pygame.transform.scale(player1_image, (280, 300))  # Adjusted size to fit within the screen
-
-    #-------------------------------------------------------Field Images-------------------------------------------------------
-    if selected_field == 'Electric Field':
-        field_image = pygame.image.load('Resources/field_electric.png')
-        field_image = pygame.transform.scale(field_image, (100, 100))
-    elif selected_field == 'Infernal Field':
-        field_image = pygame.image.load('Resources/field_infernal.png')
-        field_image = pygame.transform.scale(field_image, (100, 60))
-    elif selected_field == 'Aquatic Field':
-        field_image = pygame.image.load('Resources/field_aquatic.png')
-        field_image = pygame.transform.scale(field_image, (100, 80))
+    player1_image = pygame.transform.scale(player1_image, (180, 300))  # Adjusted size to fit within the screen
 
     #-------------------------------------------------------Pokemon Buttons Images-------------------------------------------------------
     pokemon_button_images0 = []
@@ -255,38 +227,22 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
         pokemon_button_image_scaled0 = pygame.transform.scale(pokemon_button_image, (65, 65))
         pokemon_button_images0.append((pokemon_button_image_scaled0, i))
     for i in player1_numbers:
-        pokemon_button_image = pygame.image.load(f'Resources/pokemon_{i}.png')
+        pokemon_button_image = pygame.image.load(f'Resources/pokemon_{i + 3}.png')
         pokemon_button_image_scaled1 = pygame.transform.scale(pokemon_button_image, (65, 65))
         pokemon_button_images1.append((pokemon_button_image_scaled1, i))
 
     #-------------------------------------------------------Pokemon Fighting Images-------------------------------------------------------
-    pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon0}_fight_0.png')
-    if round_1_pokemon0 < 3:
-        pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
-    else:
-        pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (260, 300))
+    pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight_0.png')
+    pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
 
-    pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon1}_fight_1.png')
-    if round_1_pokemon1 < 3:
-        pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
-    else:
-        pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (260, 300))
+    pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index1 + 3}_fight_1.png')
+    pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
 
     #-------------------------------------------------------Pokemon Attack Buttons-------------------------------------------------------
-    attack_choose_button_texts0 = pokemon_data[round_1_pokemon0]['attacks']
-    attack_choose_button_texts1 = pokemon_data[round_1_pokemon1]['attacks']
+    attack_choose_button_texts0 = pokemon_data0[current_pokemon_index0]['attacks']
+    attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
 
     #-------------------------------------------------------Loop Running-------------------------------------------------------
-    timer = 0
-    show_field = False
-    positions = []
-    clock = pygame.time.Clock()
-
-    sound_playing = False
-    sound_duration = field_sound.get_length() * 1000
-
-    last_attack_time = 0
-    computer_action_text = ""
 
     while True:
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -304,10 +260,10 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
                     if pokemon_choose_button_x1[i] <= mouse_x <= pokemon_choose_button_x1[i] + 65 and \
                             pokemon_choose_button_y1 <= mouse_y <= pokemon_choose_button_y1 + 65 and player1_healths[i] > 0:
                         current_pokemon_index1 = i
-                        round_1_pokemon1 = player1_numbers[current_pokemon_index1]
-                        attack_choose_button_texts1 = pokemon_data[round_1_pokemon1]['attacks']
-                        pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon1}_fight_1.png')
-                        if round_1_pokemon1 < 3:
+                        current_pokemon_index1 = player1_numbers[current_pokemon_index1]
+                        attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
+                        pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index1 + 3}_fight_1.png')
+                        if current_pokemon_index1 < 3:
                             pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
                         else:
                             pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (260, 300))
@@ -319,98 +275,87 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
                     current_attack_choose_button_clicked1 = int(row * 2 + col)
                     action = attack_choose_button_texts1[current_attack_choose_button_clicked1]
 
-                    if action == "Defense" and defense_used1 < defense_max:
-                        defense_used1 += 1
-                        player1_healths[current_pokemon_index1] -= 5  # Reduced self-damage for defense
-                        print(f"{pokemon_data[round_1_pokemon1]['name']} used Defense and lost 5 health!")
-                    elif action == "Elixir" and elixir_used1 >= 5:  # Added Elixir action handling
-                        elixir_used1 -= 5
-                        player1_healths[current_pokemon_index1] = min(max_health, player1_healths[current_pokemon_index1] + 30)
-                        print(f"{pokemon_data[round_1_pokemon1]['name']} used Elixir and gained 30 health!")
-                    elif action == "Elixir" and elixir_used1 < 5:  # Elixir depleted message
-                        draw_text(window, "You have used all elixirs. Choose another option.", font, BLACK, WIDTH // 2, HEIGHT // 2)
-                        print("You have used all elixirs. Choose another option.")
+                    if action == "Defense":
+                        print(f"{pokemon_data1[current_pokemon_index1]['name']} used Defense!")
                     else:
-                        attacker_type = pokemon_data[round_1_pokemon1]['type']
-                        defender_type = pokemon_data[round_1_pokemon0]['type']
-                        damage = attack_damage(attacker_type, defender_type, field_type_value)
-                        if defense_used0:
-                            defense_used0 = False
-                           # draw_text(window, "Your attack is defended by your opponent", font, BLACK, WIDTH // 2, HEIGHT // 2)
-                            print("Your attack is defended by your opponent!")
-                        else:
-                            player0_healths[current_pokemon_index0] -= damage
-                            print(f"{pokemon_data[round_1_pokemon1]['name']} used {action} on {pokemon_data[round_1_pokemon0]['name']} causing {damage} damage!")
+                        attacker_type = pokemon_data1[current_pokemon_index1]['type']
+                        defender_type = pokemon_data0[current_pokemon_index0]['type']
+                        damage = attack_damage(attacker_type, defender_type, field_type_value)        
+                        player0_healths[current_pokemon_index0] -= damage
+                        print(f"{pokemon_data1[current_pokemon_index1]['name']} used {action} on {pokemon_data0[current_pokemon_index0]['name']} causing {damage} damage!")
 
                     if player0_healths[current_pokemon_index0] <= 0:
                         player0_healths[current_pokemon_index0] = 0
-                        print(f"{pokemon_data[round_1_pokemon0]['name']} has fainted!")
-                        current_pokemon_index0 = pokemon_swap_ai.select_pokemon(player0_numbers, player0_healths, round_1_pokemon0, field_type_value)
+                        print(f"{pokemon_data0[current_pokemon_index0]['name']} has fainted!")
+                        best_pokemon_index0 = find_best_pokemon_index(current_pokemon_index0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
+                        if best_pokemon_index0 == current_pokemon_index0:
+                            player0_healths[best_pokemon_index0] += elixir0.pop(0)
+                        elif best_pokemon_index0 != current_pokemon_index0:
+                            current_pokemon_index0 = best_pokemon_index0
                         if current_pokemon_index0 is None:
                             print("Team Rocket is defeated!")
-                           # draw_text(window, "Team Rocket is defeated!", font, BLACK, WIDTH // 4, HEIGHT // 4)
+                            draw_text(window, "Team Rocket is defeated!", font, BLACK, WIDTH // 4, HEIGHT // 4)
                             pygame.display.flip()
                             time.sleep(3)
                             return
-                        round_1_pokemon0 = player0_numbers[current_pokemon_index0]
-                        attack_choose_button_texts0 = pokemon_data[round_1_pokemon0]['attacks']
-                        pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon0}_fight_0.png')
-                        if round_1_pokemon0 < 3:
-                            pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
-                        else:
-                            pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (260, 300))
+                        attack_choose_button_texts0 = pokemon_data0[current_pokemon_index0]['attacks']
+                        pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight_0.png')
+                        pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
 
                     player_turn = False
                     last_attack_time = pygame.time.get_ticks()
                 else:
                     current_attack_choose_button_clicked1 = None
+        
+        #-------------------------------------------------------Field-------------------------------------------------------
+        
+        if moves % 3 == 2:
+            val = random.randint(0, 3)
+            if val == 0:
+                field_type_value = 'electric'
+                draw_field_images(background_images[0], window, positions)
+            if val == 1:
+                draw_field_images(background_images[1], window, positions)
+                field_type_value = 'fire'
+            if val == 2:
+                draw_field_images(background_images[2], window, positions)
+                field_type_value = 'water'
 
         if not player_turn and pygame.time.get_ticks() - last_attack_time >= 1000:
-            _, action = minimax(
-                (player0_healths, player1_healths, player_turn, current_pokemon_index0, current_pokemon_index1),
-                3, float('-inf'), float('inf'), False, [defense_max - defense_used0, defense_max - defense_used1], [elixir_used0, elixir_used1], field_type_value
-            )
+            action = choose_action(field_type_value, current_pokemon_index0, current_pokemon_index1)
+            moves += 1
+
             computer_action_text = f"Team Rocket chose {action}"
             print(computer_action_text)
 
-            if action == "Defense" and defense_used0 < defense_max:
-                defense_used0 += 1
-                player0_healths[current_pokemon_index0] -= 10
-                print(f"{pokemon_data[round_1_pokemon0]['name']} used Defense and lost 10 health!")
-            elif action == "Elixir" and elixir_used0 >= 5:  # Added Elixir action handling
-                elixir_used0 -= 5
-                player0_healths[current_pokemon_index0] = min(max_health, player0_healths[current_pokemon_index0] + 30)
-                draw_text(window, "used Elixir and gained 30 health!", font, GRAY, WIDTH // 2, HEIGHT // 2)
-                print(f"{pokemon_data[round_1_pokemon0]['name']} used Elixir and gained 30 health!")
-            elif action == "Elixir" and elixir_used0 < 5:  # Elixir depleted message
-                draw_text(window, "Team Rocket has used all elixirs. Choosing another option.", font, BLACK, WIDTH // 2, HEIGHT // 2)
-                print("Team Rocket has used all elixirs. Choosing another option.")
+            if action == "Defense":
+                print(f"{pokemon_data0[current_pokemon_index0]['name']} used Defense!")
             else:
-                attacker_type = pokemon_data[round_1_pokemon0]['type']
-                defender_type = pokemon_data[round_1_pokemon1]['type']
-                damage = attack_damage(attacker_type, defender_type, field_type_value) + 10  # Increased attack damage
-                if defense_used1:
-                    defense_used1 = False
-                    draw_text(window, "Your attack is defended by Team Rocket", font, WHITE, WIDTH // 2, HEIGHT // 2)
-                    print("Your attack is defended by Team Rocket!")
-                else:
-                    player1_healths[current_pokemon_index1] -= damage
-                    print(f"{pokemon_data[round_1_pokemon0]['name']} used {action} on {pokemon_data[round_1_pokemon1]['name']} causing {damage} damage!")
+                attacker_type = pokemon_data0[current_pokemon_index0]['type']
+                defender_type = pokemon_data1[current_pokemon_index1]['type']
+                damage = attack_damage(attacker_type, defender_type, field_type_value)  # Increased attack damage   
+                player1_healths[current_pokemon_index1] -= damage
+                print(f"{pokemon_data0[current_pokemon_index0]['name']} used {action} on {pokemon_data1[current_pokemon_index1]['name']} causing {damage} damage!")
 
             if player1_healths[current_pokemon_index1] <= 0:
                 player1_healths[current_pokemon_index1] = 0
-                print(f"{pokemon_data[round_1_pokemon1]['name']} has fainted!")
-                current_pokemon_index1 = pokemon_swap_ai.select_pokemon(player1_numbers, player1_healths, round_1_pokemon1, field_type_value)
+                print(f"{pokemon_data1[current_pokemon_index1]['name']} has fainted!")
+                if player1_healths[(current_pokemon_index1 + 1) % 3] != 0:
+                    current_pokemon_index1 = (current_pokemon_index1 + 1) % 3
+                elif player1_healths[(current_pokemon_index1 + 2) % 3] != 0:
+                    current_pokemon_index1 = (current_pokemon_index1 + 2) % 3
+                else:
+                    current_pokemon_index1 = None
                 if current_pokemon_index1 is None:
                     print("Ash is defeated!")
-                    draw_text(window, "Ash is defeated!", font, BLACK, WIDTH // 2, HEIGHT // 2)
+                    draw_text(window, "Ash is defeated!", font, RED, WIDTH // 2, HEIGHT // 2)
                     pygame.display.flip()
                     time.sleep(3)
                     return
-                round_1_pokemon1 = player1_numbers[current_pokemon_index1]
-                attack_choose_button_texts1 = pokemon_data[round_1_pokemon1]['attacks']
-                pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{round_1_pokemon1}_fight_1.png')
-                if round_1_pokemon1 < 3:
+                current_pokemon_index1 = player1_numbers[current_pokemon_index1]
+                attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
+                pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index1 + 3}_fight_1.png')
+                if current_pokemon_index1 < 3:
                     pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
                 else:
                     pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (260, 300))
@@ -421,35 +366,35 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
         window.blit(background_images[background_image_index], (0, 0))
 
         #-------------------------------------------------------Players-------------------------------------------------------
-        window.blit(player0_image, (20, 130))
-        window.blit(player1_image, (WIDTH - 320, 150))  # Adjusted position to fit within the screen
+        window.blit(player0_image, (50, 80))
+        window.blit(player1_image, (WIDTH - 270, 150))  # Adjusted position to fit within the screen
 
         #-------------------------------------------------------Health Display-------------------------------------------------------
         # Draw health bars for both players with adjusted positions
         # Calculate the x-coordinate for the health bars
-        health_bar_x0 = attack_choose_button_x_start0 + 2 * (attack_choose_button_width + attack_choose_button_spacing) + 10
+        health_bar_x0 = attack_choose_button_x_start0 + 2 * (attack_choose_button_width + attack_choose_button_spacing)
         health_bar_x1 = health_bar_x0 + 580  # Adjust the gap between the health bars
         # Calculate the y-coordinate for both health bars
         health_bar_y = attack_choose_button_y_start0
 
         # For player0's health bar
-        draw_health_bar(window, player0_healths[current_pokemon_index0], max_health, health_bar_x0, health_bar_y, 100, 20)
+        draw_health_bar(window, player0_healths[current_pokemon_index0], max_health, health_bar_x0 + 170, health_bar_y + 5, 250, 40)
 
         # For player1's health bar
-        draw_health_bar(window, player1_healths[current_pokemon_index1], max_health, health_bar_x1, health_bar_y, 100, 20)
+        draw_health_bar(window, player1_healths[current_pokemon_index1], max_health, health_bar_x1 + 280, health_bar_y + 5, 250, 40)
 
         # Define the font for the text
         text_font = pygame.font.SysFont(None, 20)
 
         # Render the text for player0's health
-        health_text_surface0 = text_font.render(f"Health Remain: {player0_healths[current_pokemon_index0]}%", True, BLACK)
+        health_text_surface0 = font.render(f"Health Remain: {player0_healths[current_pokemon_index0]}%", True, BLACK)
         health_text_rect0 = health_text_surface0.get_rect()
-        health_text_rect0.midtop = (health_bar_x0 + 50, health_bar_y + 30)  # Adjust position as needed
+        health_text_rect0.midtop = (health_bar_x0 + 300, health_bar_y + 12)  # Adjust position as needed
 
         # Render the text for player1's health
-        health_text_surface1 = text_font.render(f"Health Remain: {player1_healths[current_pokemon_index1]}%", True, BLACK)
+        health_text_surface1 = font.render(f"Health Remain: {player1_healths[current_pokemon_index1]}%", True, BLACK)
         health_text_rect1 = health_text_surface1.get_rect()
-        health_text_rect1.midtop = (health_bar_x1 + 50, health_bar_y + 30)  # Adjust position as needed
+        health_text_rect1.midtop = (health_bar_x1 + 405, health_bar_y + 12)  # Adjust position as needed
 
         # Blit the text onto the window
         window.blit(health_text_surface0, health_text_rect0)
@@ -459,31 +404,6 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
         computer_action_surface = font.render(computer_action_text, True, BLACK)
         computer_action_rect = computer_action_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         window.blit(computer_action_surface, computer_action_rect)
-
-        #-------------------------------------------------------Field-------------------------------------------------------
-        timer += clock.get_rawtime()
-        clock.tick()
-        
-        if timer >= 10000:
-            positions = generate_random_positions(random.randint(2, 5), [])
-            timer -= 10000
-            
-            if sound_playing:
-                field_sound.stop()
-                sound_playing = False
-        
-        if timer < 5000:
-            show_field = True
-            draw_field_images(field_image, window, positions)
-            if not sound_playing:
-                field_sound.play() 
-                sound_playing = True
-                
-        else:
-            show_field = False
-            if sound_playing:
-                field_sound.stop() 
-                sound_playing = False
 
         #-------------------------------------------------------Pokemon Buttons Border-------------------------------------------------------
         pokemon_choose_button_x0 = 301
@@ -511,50 +431,23 @@ def play_screen(toss_result, selected_field, player0_numbers, player1_numbers, r
             window.blit(pokemon_button_images1[i][0], (pokemon_choose_button_x1[i], pokemon_choose_button_y1))
 
         for i in range(3):
-            if round_1_pokemon0 == player0_numbers[i]:
+            if current_pokemon_index0 == player0_numbers[i]:
                 pokemon_button_image_copy = pokemon_button_images0[i][0].copy()
                 pokemon_button_image_copy.fill(RED, None, pygame.BLEND_RGBA_MULT)
                 window.blit(pokemon_button_image_copy, (pokemon_choose_button_x0[i], pokemon_choose_button_y0))
 
         for i in range(3):
-            if round_1_pokemon1 == player1_numbers[i]:
+            if current_pokemon_index1 == player1_numbers[i]:
                 pokemon_button_image_copy = pokemon_button_images1[i][0].copy()
                 pokemon_button_image_copy.fill(BLUE, None, pygame.BLEND_RGBA_MULT)
                 window.blit(pokemon_button_image_copy, (pokemon_choose_button_x1[i], pokemon_choose_button_y1))
 
         #-------------------------------------------------------Pokemon Fighting-------------------------------------------------------
-        if round_1_pokemon0 < 3:
-            window.blit(pokemon_fight_image0, (265, 305))
-        else:
-            window.blit(pokemon_fight_image0, (265, 305-75))
-
-        if round_1_pokemon1 < 3:
-            window.blit(pokemon_fight_image1, (WIDTH-395, 305))
-        else:
-            window.blit(pokemon_fight_image1,  (WIDTH-395-130, 305-75))
+        window.blit(pokemon_fight_image0, (300, 305))
+        window.blit(pokemon_fight_image1, (WIDTH-400, 305))
 
         #-------------------------------------------------------Pokemon Attack Buttons-------------------------------------------------------
-        draw_attack_choose_buttons(window, attack_choose_button_texts0, attack_choose_button_x_start0, attack_choose_button_y_start0, current_attack_choose_button_clicked0)
         draw_attack_choose_buttons(window, attack_choose_button_texts1, attack_choose_button_x_start1, attack_choose_button_y_start1, current_attack_choose_button_clicked1)
-
-        # Display the number of defenses left for each player
-        defenses_left_text0 = f"Defenses left: {defense_max - defense_used0}"  # Added line for defense count display
-        defenses_left_surface0 = font.render(defenses_left_text0, True, BLACK)  # Added line for defense count display
-        window.blit(defenses_left_surface0, (attack_choose_button_x_start0, attack_choose_button_y_start0 - 30))  # Added line for defense count display
-
-        defenses_left_text1 = f"Defenses left: {defense_max - defense_used1}"  # Added line for defense count display
-        defenses_left_surface1 = font.render(defenses_left_text1, True, BLACK)  # Added line for defense count display
-        window.blit(defenses_left_surface1, (attack_choose_button_x_start1, attack_choose_button_y_start1 - 30))  # Added line for defense count display
-
-        # Display the number of elixirs left for each player
-        elixirs_left_text0 = f"Elixirs left: {elixir_used0}"  # Added line for elixir count display
-        elixirs_left_surface0 = font.render(elixirs_left_text0, True, BLACK)  # Added line for elixir count display
-        window.blit(elixirs_left_surface0, (attack_choose_button_x_start0, attack_choose_button_y_start0 - 60))  # Added line for elixir count display
-
-        elixirs_left_text1 = f"Elixirs left: {elixir_used1}"  # Added line for elixir count display
-        elixirs_left_surface1 = font.render(elixirs_left_text1, True, BLACK)  # Added line for elixir count display
-        window.blit(elixirs_left_surface1, (attack_choose_button_x_start1, attack_choose_button_y_start1 - 60))  # Added line for elixir count display
-
         pygame.display.flip()
 
         # Check if 30 seconds have passed to change the background
@@ -569,4 +462,4 @@ def draw_text(window, text, font, color, x, y):
     pygame.display.flip()
     pygame.time.delay(1000)  # Display the text for 1 second
 
-play_screen('Team_Rocket', random.choice(["Electric Field", "Infernal Field", "Aquatic Field"]), [0, 1, 2], [3, 4, 5], 1, 5, None, None)
+#play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50], [0,1])
