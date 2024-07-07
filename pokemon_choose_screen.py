@@ -25,7 +25,7 @@ def draw_alert_message(window, message, font, color, bg_color, x, y, width, heig
 background_image = pygame.image.load('Resources/board_pokemon.jpg')
 background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
-def pokemon_round_1_screen(player0_numbers, player1_numbers):
+def pokemon_choose_screen(player0_numbers, player1_numbers):
 
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Toss Screen")

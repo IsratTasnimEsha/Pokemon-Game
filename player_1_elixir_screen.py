@@ -17,7 +17,7 @@ font1 = pygame.font.SysFont("comicsansms", 25)
 font2 = pygame.font.SysFont("comicsansms", 20)
 font3 = pygame.font.SysFont("comicsansms", 30)
 
-player1_best_elixirs = [0, 0, 0, 0, 0]
+player1_best_elixirs = []
 
 def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, True, color)
@@ -126,7 +126,7 @@ def player_1_elixir_screen():
                                 return elixir_price_power, remaining_original, player1_best_elixirs
 
                             clicked_positions[i] = True
-                            player1_best_elixirs[i] = elixir_price_power[i][1]
+                            player1_best_elixirs.append(elixir_price_power[i][1])
                             remaining -= elixir_price_power[i][0]
                             sum_of_power += elixir_price_power[i][1]
                             draw_static_elements()

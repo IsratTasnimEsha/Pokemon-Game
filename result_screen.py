@@ -22,7 +22,7 @@ def draw_text(text, font, color, surface, x, y):
 def draw_button_border(surface, rect, border_color, border_width):
     pygame.draw.rect(surface, border_color, rect, border_width)
 
-def result_pokemon_find_screen(winner):
+def result_screen(winner):
     running = True
 
     background_image = pygame.image.load('Resources/board_battle_field.jpg')
