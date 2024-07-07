@@ -240,7 +240,8 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         if bg_index == 2:
             field_type_value = 'water'
         
-        current_pokemon_index0 = find_best_pokemon_index(0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
+        if(sum(player0_healths) == 300):
+            current_pokemon_index0 = find_best_pokemon_index(0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
 
         #-------------------------------------------------------Pokemon Fighting Images-------------------------------------------------------
         pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight_0.png')
@@ -455,4 +456,4 @@ def draw_text(window, text, font, color, x, y):
     pygame.display.flip()
     pygame.time.delay(1000)  # Display the text for 1 second
 
-#play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50], [0,1])
+play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50], [0,1])
