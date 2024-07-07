@@ -46,9 +46,10 @@ def result_pokemon_find_screen(winner):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
-            elif event.type == pygame.KEYDOWN:  
-                pass
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
 
         window.fill(WHITE)
         window.blit(background_image, (0, 0))

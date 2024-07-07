@@ -56,6 +56,7 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers):
         pokemon_buttons1.append(pokemon_button)
 
     while True:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -75,6 +76,9 @@ def pokemon_round_1_screen(player0_numbers, player1_numbers):
                         for b in pokemon_buttons1:
                             b['color'] = WHITE
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
                 if round_1_pokemon is not None:   
                     return round_1_pokemon
                     

@@ -168,6 +168,7 @@ def pokemon_find_screen():
     while True:
         current_time = pygame.time.get_ticks()
 
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -184,8 +185,10 @@ def pokemon_find_screen():
                                 break
                         player_1_node = clicked_node
                         space_pressed = False
-
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
                 if event.key == pygame.K_SPACE and not space_pressed:
                     space_pressed = True
                     for i in range(3):

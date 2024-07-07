@@ -5,11 +5,10 @@ import sys
 from fuzzy_logic_decision import find_best_pokemon_index
 
 pygame.init()
-timer = 0
-clock = pygame.time.Clock()
-timer += clock.get_rawtime()
-clock.tick()
+
+move = 0
 moves = 0
+bg_index = 0
 
 # Constants
 WIDTH, HEIGHT = 1500, 770
@@ -25,18 +24,18 @@ RED = (255, 0, 0, 128)
 font = pygame.font.SysFont("comicsansms", 15)
 
 # Simplified Pokémon data structure
+
 pokemon_data0 = {
+    0: {"name": "Meowth", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
+    1: {"name": "Weezing", "health": 100, "attacks": ["Attack", "Defense"], "type": "Fire"},
+    2: {"name": "Wobbuffet", "health": 100, "attacks": ["Attack", "Defense"], "type": "Water"}
+}
+
+pokemon_data1 = {
     0: {"name": "Pikachu", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
     1: {"name": "Charmander", "health": 100, "attacks": ["Attack", "Defense"], "type": "Fire"},
     2: {"name": "Squirtle", "health": 100, "attacks": ["Attack", "Defense"], "type": "Water"},
 }
-
-pokemon_data1 = {
-    0: {"name": "Meowth", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
-    1: {"name": "Wobbuffet", "health": 100, "attacks": ["Attack", "Defense"], "type": "Fire"},
-    2: {"name": "Weezing", "health": 100, "attacks": ["Attack", "Defense"], "type": "Water"}
-}
-
 
 # Define the mappings for field names to indices
 
@@ -159,18 +158,18 @@ def draw_health_bar(window, health, max_health, x, y, width, height):
 
 def attack_damage(attacker_type, defender_type, field_type):
     base_damage = 10
-    field_bonus = 3 if attacker_type == field_type else 0
+    field_bonus = 5 if attacker_type == field_type else 0
     type_bonus = 0
 
     if (attacker_type == "Electric" and defender_type == "Water") or \
        (attacker_type == "Water" and defender_type == "Fire") or \
        (attacker_type == "Fire" and defender_type == "Electric"):
-        type_bonus = 5
+        type_bonus = 3
 
     return base_damage + field_bonus + type_bonus
 
 def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir0, elixir1):
-    global timer, moves
+    global move, moves, bg_index
 
     window = pygame.display.set_mode(WINDOW_SIZE)
     pygame.display.set_caption("Play Screen")
@@ -193,24 +192,16 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
     
     #-------------------------------------------------------Background Images-------------------------------------------------------
     background_images = [
-        pygame.image.load('Resources/electric1.png'),
-        pygame.image.load('Resources/fire2.png'),
-        pygame.image.load('Resources/water.png')        
+        pygame.image.load('Resources/board_electric.png'),
+        pygame.image.load('Resources/board_fire.png'),
+        pygame.image.load('Resources/board_water.png')        
     ]
     background_images = [pygame.transform.scale(image, (WIDTH, HEIGHT)) for image in background_images]
-    background_image_index = 0
-    last_background_change_time = pygame.time.get_ticks()
 
-    show_field = False
     positions = []
 
     last_attack_time = 0
     computer_action_text = ""
-
-    draw_field_images(background_images[0], window, positions)
-    field_type_value = 'electric'
-        
-    current_pokemon_index0 = find_best_pokemon_index(0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
 
     #-------------------------------------------------------Players Images-------------------------------------------------------
     player0_image = pygame.image.load('Resources/player_0.png')
@@ -231,20 +222,37 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         pokemon_button_image_scaled1 = pygame.transform.scale(pokemon_button_image, (65, 65))
         pokemon_button_images1.append((pokemon_button_image_scaled1, i))
 
-    #-------------------------------------------------------Pokemon Fighting Images-------------------------------------------------------
-    pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight_0.png')
-    pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
-
-    pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index1 + 3}_fight_1.png')
-    pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
-
-    #-------------------------------------------------------Pokemon Attack Buttons-------------------------------------------------------
-    attack_choose_button_texts0 = pokemon_data0[current_pokemon_index0]['attacks']
-    attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
-
     #-------------------------------------------------------Loop Running-------------------------------------------------------
-
     while True:
+        window.fill(WHITE)
+
+        if (moves % 3 == 0):
+            window.blit(background_images[bg_index], (0, 0))
+        if (moves % 3 == 1):
+            window.blit(background_images[bg_index], (0, 0))
+        if (moves % 3 == 2):
+            window.blit(background_images[bg_index], (0, 0))
+
+        if bg_index == 0:
+            field_type_value = 'electric'
+        if bg_index == 1:
+            field_type_value = 'fire'
+        if bg_index == 2:
+            field_type_value = 'water'
+        
+        current_pokemon_index0 = find_best_pokemon_index(0, current_pokemon_index1, field_type_value, player0_healths, elixir0)
+
+        #-------------------------------------------------------Pokemon Fighting Images-------------------------------------------------------
+        pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight_0.png')
+        pokemon_fight_image0 = pygame.transform.scale(pokemon_fight_image0, (130, 150))
+
+        pokemon_fight_image1 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index1 + 3}_fight_1.png')
+        pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (130, 150))
+
+        #-------------------------------------------------------Pokemon Attack Buttons-------------------------------------------------------
+        attack_choose_button_texts0 = pokemon_data0[current_pokemon_index0]['attacks']
+        attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
+
         mouse_x, mouse_y = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -306,24 +314,17 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
                     last_attack_time = pygame.time.get_ticks()
                 else:
                     current_attack_choose_button_clicked1 = None
-        
-        #-------------------------------------------------------Field-------------------------------------------------------
-        
-        if moves % 3 == 2:
-            val = random.randint(0, 3)
-            if val == 0:
-                field_type_value = 'electric'
-                draw_field_images(background_images[0], window, positions)
-            if val == 1:
-                draw_field_images(background_images[1], window, positions)
-                field_type_value = 'fire'
-            if val == 2:
-                draw_field_images(background_images[2], window, positions)
-                field_type_value = 'water'
 
         if not player_turn and pygame.time.get_ticks() - last_attack_time >= 1000:
             action = choose_action(field_type_value, current_pokemon_index0, current_pokemon_index1)
-            moves += 1
+            move += 1
+            if (move % 3 == 0):
+                moves += 1
+                bg_index = random.randint(0, 2)
+
+            if moves % 5 == 0:
+                background_image = background_images[1]
+                background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 
             computer_action_text = f"Team Rocket chose {action}"
             print(computer_action_text)
@@ -361,9 +362,6 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
                     pokemon_fight_image1 = pygame.transform.scale(pokemon_fight_image1, (260, 300))
 
             player_turn = True
-
-        window.fill(WHITE)
-        window.blit(background_images[background_image_index], (0, 0))
 
         #-------------------------------------------------------Players-------------------------------------------------------
         window.blit(player0_image, (50, 80))
@@ -449,11 +447,6 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         #-------------------------------------------------------Pokemon Attack Buttons-------------------------------------------------------
         draw_attack_choose_buttons(window, attack_choose_button_texts1, attack_choose_button_x_start1, attack_choose_button_y_start1, current_attack_choose_button_clicked1)
         pygame.display.flip()
-
-        # Check if 30 seconds have passed to change the background
-        if pygame.time.get_ticks() - last_background_change_time > 10000:
-            background_image_index = (background_image_index + 1) % len(background_images)
-            last_background_change_time = pygame.time.get_ticks()
 
 def draw_text(window, text, font, color, x, y):
     text_surface = font.render(text, True, color)

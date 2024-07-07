@@ -112,7 +112,10 @@ def player_1_elixir_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
                     for i, rect in enumerate(elixir_rects):
