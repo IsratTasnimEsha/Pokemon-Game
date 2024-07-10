@@ -14,14 +14,6 @@ pygame.display.set_caption("Pokemon Battle")
 
 font = pygame.font.SysFont("comicsansms", 25)
 
-def draw_text(text, font, color, surface, x, y):
-    text_obj = font.render(text, True, color)
-    text_rect = text_obj.get_rect(center=(x, y))
-    surface.blit(text_obj, text_rect)
-
-def draw_button_border(surface, rect, border_color, border_width):
-    pygame.draw.rect(surface, border_color, rect, border_width)
-
 def result_screen(winner):
     running = True
 

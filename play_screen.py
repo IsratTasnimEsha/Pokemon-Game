@@ -24,7 +24,7 @@ TRANSPARENT = (255, 255, 255, 128)
 radius = 100
 
 #-------------------------------------------------------Fonts-------------------------------------------------------
-font = pygame.font.SysFont("comicsansms", 15)
+font = pygame.font.SysFont("comicsansms", 17)
 font2 = pygame.font.SysFont("comicsansms", 25)
 font3 = pygame.font.SysFont("comicsansms", 50)
 
@@ -40,11 +40,11 @@ attack_choose_button_spacing = 5
 target_x0 = 1060
 target_y0 = 350
 
-target_x1 = 300
+target_x1 = 340
 target_y1 = 350
 
-speed0 = 50
-speed1 = 50
+speed0 = 30
+speed1 = 30
 
 pokemon_data0 = {
     0: {"name": "Meowth", "health": 100, "attacks": ["Attack", "Defense"], "type": "Electric"},
@@ -154,10 +154,10 @@ def draw_attack_choose_buttons(window, attack_choose_button_texts, attack_choose
         text_rect = text_surface.get_rect(center=rect.center)
         window.blit(text_surface, text_rect)
 
-def draw_health_bar(window, health, max_health, x, y, width, height):
+def draw_health_bar(window, color, health, max_health, x, y, width, height):
     health_bar_width = int((health / max_health) * width)
     pygame.draw.rect(window, GRAY, (x, y, width, height))
-    pygame.draw.rect(window, BLUE, (x, y, health_bar_width, height))
+    pygame.draw.rect(window, color, (x, y, health_bar_width, height))
 
 def attack_damage(attacker_type, defender_type, field_type):
     base_damage = 10
@@ -229,18 +229,18 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         pokemon_button_images1.append((pokemon_button_image_scaled1, i))
 
     #-------------------------------------------------------Elixir Images-------------------------------------------------------
-    elixir0_image = pygame.image.load(f'Resources/elixir0.png')
+    elixir0_image = pygame.image.load(f'Resources/elixir_0.png')
     elixir0_image = pygame.transform.scale(elixir0_image, (50, 80))
-    elixir1_image = pygame.image.load(f'Resources/elixir1.png')
+    elixir1_image = pygame.image.load(f'Resources/elixir_1.png')
     elixir1_image = pygame.transform.scale(elixir1_image, (50, 80))
-    elixir2_image = pygame.image.load(f'Resources/elixir2.png')
+    elixir2_image = pygame.image.load(f'Resources/elixir_2.png')
     elixir2_image = pygame.transform.scale(elixir2_image, (50, 80))
-    elixir3_image = pygame.image.load(f'Resources/elixir3.png')
+    elixir3_image = pygame.image.load(f'Resources/elixir_3.png')
     elixir3_image = pygame.transform.scale(elixir3_image, (50, 80))
 
     transparent_rect = pygame.Surface((120, 100), pygame.SRCALPHA)
     transparent_rect.fill(TRANSPARENT)
-    pygame.draw.rect(transparent_rect, BLACK, transparent_rect.get_rect(), 3)
+    pygame.draw.rect(transparent_rect, WHITE, transparent_rect.get_rect(), 3)
 
     #-------------------------------------------------------Pokemon Attack Images-------------------------------------------------------
     player0_pokemon_attack_images = [None] * 3
@@ -350,8 +350,8 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for i, (img, num) in enumerate(pokemon_button_images1):
-                    if pokemon_choose_button_x1[i] <= mouse_x <= pokemon_choose_button_x1[i] + 65 and \
-                            pokemon_choose_button_y1 <= mouse_y <= pokemon_choose_button_y1 + 65 and player1_healths[i] > 0:
+                    if pokemon_choose_button_x1[i] <= mouse_x <= pokemon_choose_button_x1[i] + 75 and \
+                            pokemon_choose_button_y1 <= mouse_y <= pokemon_choose_button_y1 + 75 and player1_healths[i] > 0:
                         current_pokemon_index1 = i
                         current_pokemon_index1 = player1_numbers[current_pokemon_index1]
                         attack_choose_button_texts1 = pokemon_data1[current_pokemon_index1]['attacks']
@@ -367,7 +367,7 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
 
                     if 1300 <= mouse_x <= 1300 + 120 and 550 <= mouse_y <= 550 + 100:
                         transparent_rect.fill(BLUE)
-                        pygame.draw.rect(transparent_rect, BLACK, transparent_rect.get_rect(), 3)
+                        pygame.draw.rect(transparent_rect, WHITE, transparent_rect.get_rect(), 3)
 
                         if len(elixir1) != 0:
                             if player1_healths[current_pokemon_index1] + elixir1[0] >= 100:
@@ -420,7 +420,7 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
                         
                         if current_pokemon_index0 is None:
                             print("Team Rocket is defeated!")
-                            draw_text(window, "Team Rocket is defeated!", font3, BLACK, WIDTH // 2, HEIGHT // 2)
+                            draw_text(window, "Team Rocket is defeated!", font3, BLUE, WIDTH // 2, HEIGHT // 2)
                             pygame.display.flip()
                             time.sleep(3)
                             return "Me(Ash)"
@@ -535,14 +535,14 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         health_bar_x1 = health_bar_x0 + 580  
         health_bar_y = attack_choose_button_y_start0
 
-        draw_health_bar(window, player0_healths[current_pokemon_index0], max_health, health_bar_x0 + 170, health_bar_y + 5, 250, 40)
-        draw_health_bar(window, player1_healths[current_pokemon_index1], max_health, health_bar_x1 + 280, health_bar_y + 5, 250, 40)
+        draw_health_bar(window, RED, player0_healths[current_pokemon_index0], max_health, health_bar_x0 + 170, health_bar_y + 5, 250, 40)
+        draw_health_bar(window, BLUE, player1_healths[current_pokemon_index1], max_health, health_bar_x1 + 280, health_bar_y + 5, 250, 40)
 
-        health_text_surface0 = font.render(f"Health Remain: {player0_healths[current_pokemon_index0]}%", True, BLACK)
+        health_text_surface0 = font.render(f"Health Remaining: {player0_healths[current_pokemon_index0]}%", True, BLACK)
         health_text_rect0 = health_text_surface0.get_rect()
         health_text_rect0.midtop = (health_bar_x0 + 300, health_bar_y + 12)  
 
-        health_text_surface1 = font.render(f"Health Remain: {player1_healths[current_pokemon_index1]}%", True, BLACK)
+        health_text_surface1 = font.render(f"Health Remaining: {player1_healths[current_pokemon_index1]}%", True, BLACK)
         health_text_rect1 = health_text_surface1.get_rect()
         health_text_rect1.midtop = (health_bar_x1 + 405, health_bar_y + 12)  # Adjust position as needed
 
@@ -563,7 +563,7 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         pokemon_choose_button_y0 = 45
 
         pokemon_choose_button_x1 = WIDTH - 490
-        pokemon_choose_button_x1 = [pokemon_choose_button_x1, pokemon_choose_button_x1 + 65, pokemon_choose_button_x1 + 130]
+        pokemon_choose_button_x1 = [pokemon_choose_button_x1, pokemon_choose_button_x1 + 75, pokemon_choose_button_x1 + 150]
         pokemon_choose_button_y1 = 45
 
         for x in pokemon_choose_button_x0:
@@ -581,7 +581,7 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
             pygame.draw.rect(window, (0, 0, 0), (x - 2, pokemon_choose_button_y1 - 2, 70, 70), 2)
         for i in range(3):
             window.blit(pokemon_button_images1[i][0], (pokemon_choose_button_x1[i], pokemon_choose_button_y1))
-
+        
         for i in range(3):
             if current_pokemon_index0 == player0_numbers[i]:
                 pokemon_button_image_copy = pokemon_button_images0[i][0].copy()
@@ -617,6 +617,14 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
         if len(elixir1) != 0:
             draw_text(window, f"+{elixir1[0]}", font2, BLACK, 1380, 600)
         
+        for i in range(3):
+            draw_text(window, f"{player0_healths[i]}%", font, WHITE, 335 + i * 75, 30)
+        for i in range(3):
+            draw_text(window, f"{player1_healths[i]}%", font, WHITE, 1045 + i * 75, 30)
+        
+        draw_text(window, f"Elixirs: {elixir0}", font, WHITE, 625, 95)
+        draw_text(window, f"Elixirs: {elixir1}", font, WHITE, 900, 95)
+        
         if image_visible0:
             window.blit(image0, image_rect0.topleft)
         if image_visible1:
@@ -630,4 +638,4 @@ def draw_text(window, text, font, color, x, y):
     text_rect = text_surface.get_rect(center=(x, y))
     window.blit(text_surface, text_rect)
 
-#play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50, 45], [40, 45, 50])
+play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50, 45, 35], [40, 45, 35, 50])

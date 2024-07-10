@@ -202,10 +202,10 @@ def player_0_elixir_screen(elixir_price_power, remaining):
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if 0 <= mouse_x <= 1500 and 0 <= mouse_y <= 770:
+                    return elixir_price_power, remaining, player0_best_elixirs
 
         pygame.display.flip()
-
-        pygame.time.wait(2000)  # Wait for 2000ms
-        return elixir_price_power, remaining, player0_best_elixirs
 
 #print(player_0_elixir_screen([(9, 3), (9, 15), (7, 18), (10, 17), (3, 11)], 19))
