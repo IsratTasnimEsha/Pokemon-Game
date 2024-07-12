@@ -638,4 +638,4 @@ def draw_text(window, text, font, color, x, y):
     text_rect = text_surface.get_rect(center=(x, y))
     window.blit(text_surface, text_rect)
 
-play_screen([0, 1, 2], [0, 1, 2], 1, [40, 50, 45, 35], [40, 45, 35, 50])
+#play_screen([0, 1, 2], [0, 1, 2], 0, [40, 50, 45, 35], [40, 45, 35, 50])

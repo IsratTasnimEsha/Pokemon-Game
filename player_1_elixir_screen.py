@@ -62,9 +62,9 @@ def player_1_elixir_screen():
     elixir_rects = [pygame.Rect(pos, (owned_images_sizes[i][0], owned_images_sizes[i][1])) for i, pos in enumerate(elixir_positions)]
 
     elixir_price_power = [
-        (random.randint(1, 10), random.randint(30, 50)), (random.randint(1, 10), random.randint(30, 50)), 
-        (random.randint(1, 10), random.randint(30, 50)), (random.randint(1, 10), random.randint(30, 50)), 
-        (random.randint(1, 10), random.randint(30, 50))
+        (random.randint(1, 10), random.randint(10, 30)), (random.randint(20, 30), random.randint(50, 80)), 
+        (random.randint(10, 20), random.randint(30, 50)), (random.randint(20, 30), random.randint(50, 80)), 
+        (random.randint(10, 20), random.randint(30, 50))
     ]
 
     total_prices = 0
