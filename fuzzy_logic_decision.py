@@ -38,43 +38,26 @@ def find_best_pokemon_index(player0_current_pokemon_index, player1_current_pokem
     if current_field_index == -1:
         return None
 
-    best_index = None
     best_suitability = float('-inf')
-    
-    # Check all possible Pokémon indices for player0
+
+    suitabilities = []
+
     for player0_index in range(3):
-        if player0_healths[player0_index] == 0:
+        if player0_healths[player0_index] == 0 and player0_index != player0_current_pokemon_index:
             continue
         score = get_score(current_field_index, player0_index, player1_current_pokemon_index)
         suitability = calculate_suitability(score)
-        #print(f"Suitability for player0_index {player0_index}: {suitability}")
-        if suitability > best_suitability:
-            best_suitability = suitability
-            best_index = player0_index
+        print(f"Suitability for player0_index {player0_index}: {suitability}")
+        suitabilities.append((player0_index, suitability))
 
-    # If current Pokémon has 0 HP, decide whether to drink elixir or switch Pokémon
-    if player0_healths[player0_current_pokemon_index] == 0:
-        if len(elixir0) != 0:
-            #print("Drinking elixir for current Pokémon:", player0_current_pokemon_index)
-            return player0_current_pokemon_index  # Drink elixir
-        elif best_index is not None:
-            #print("Switching to another Pokémon with HP:", best_index)
-            return best_index  # Switch to another Pokémon with HP
+    # Sort the indices according to suitability
+    sorted_indices = [index for index, suitability in sorted(suitabilities, key=lambda x: x[1], reverse=True)]
 
-    # Check if all Pokémon have 0 HP
-    if best_index is not None:
-        #print("Switching to the best available Pokémon:", best_index)
-        return best_index
+    print(f"Sorted player0_indices according to suitability: {sorted_indices}")
+    if len(sorted_indices) == 0:
+        return None
+    else:
+        return sorted_indices[0]
 
-    #print("All Pokémon have 0 HP")
-    return None  # Return None if all Pokémon have 0 HP
-
-# Example usage
-#player0_current_pokemon = 0  # Example value
-#player1_current_pokemon = 1  # Example value
-#current_field = 'fire'  # Example value
-#player0_healths = [0,0,0]  # Example health values
-#elixir0 = [1]  # Example elixir values (can be empty)
-
-#best_pokemon_index = find_best_pokemon_index(2, 1, 'fire', [100, 100, 100], [40, 30, 45])
+#best_pokemon_index = find_best_pokemon_index(0, 1, 'water', [100, 0, 0], [40, 30, 45])
 #print("Best Pokémon index for player0:", best_pokemon_index)

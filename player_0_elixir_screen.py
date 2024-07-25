@@ -149,11 +149,7 @@ def player_0_elixir_screen(elixir_price_power, remaining):
     sum_of_power = 0
 
     best_solution = genetic_algorithm(elixir_price_power, remaining, population_size, max_generations, mutation_rate)
-    #print(best_solution)
-
-    for i in range (len(best_solution)):
-        if best_solution[i] == 1:
-            window.blit(owned_images[i], elixir_positions[i])
+    print(best_solution)
 
     def draw_static_elements(remaining):
 
@@ -187,8 +183,6 @@ def player_0_elixir_screen(elixir_price_power, remaining):
 
         draw_text_with_outline(f"Power:", font2, WHITE, BLACK, window, 1270, 430)
         draw_text_with_outline(f"{sum_of_power}", font3, WHITE, BLACK, window, 1270, 470)
-
-        window.blit(owned_images[i], elixir_positions[i])
 
     draw_static_elements(remaining)
 

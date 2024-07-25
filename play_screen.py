@@ -419,11 +419,14 @@ def play_screen(player0_numbers, player1_numbers, current_pokemon_index1, elixir
                             current_pokemon_index0 = best_pokemon_index0
                         
                         if current_pokemon_index0 is None:
-                            print("Team Rocket is defeated!")
-                            draw_text(window, "Team Rocket is defeated!", font3, BLUE, WIDTH // 2, HEIGHT // 2)
-                            pygame.display.flip()
-                            time.sleep(3)
-                            return "Me(Ash)"
+                            if len(elixir0) != 0:
+                                player0_healths[current_pokemon_index0] += elixir0.pop(0)
+                            else:
+                                print("Team Rocket is defeated!")
+                                draw_text(window, "Team Rocket is defeated!", font3, BLUE, WIDTH // 2, HEIGHT // 2)
+                                pygame.display.flip()
+                                time.sleep(3)
+                                return "Me(Ash)"
                         
                         attack_choose_button_texts0 = pokemon_data0[current_pokemon_index0]['attacks']
                         pokemon_fight_image0 = pygame.image.load(f'Resources/pokemon_{current_pokemon_index0}_fight.png')
