@@ -92,10 +92,11 @@ Contributions are welcome! Feel free to submit issues, feature requests, or pull
 
 If you need help or want to share feedback, feel free to reach out at [israttasnimesha1046@gmail.com](mailto:israttasnimesha1046@gmail.com).
 
-## **Authors**
+## Authors
 
-- **Israt Tasnim Esha**
-- **Tasfia Tasnim**
+- **Israt Tasnim Esha** (1907090)
+- **Tasfia Tasnim** (1907102)
 
+**CSE 4110	- Artificial Intelligence Laboratory**  
 *Department of Computer Science and Engineering*  
 *Khulna University of Engineering and Technology*
