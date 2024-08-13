@@ -1,4 +1,4 @@
-# **Pokémon Battle Adventure**
+![Screenshot_7](https://github.com/user-attachments/assets/ef20004c-2b08-419b-af32-ea3684e0d5b7)# **Pokémon Battle Adventure**
 
 Welcome to **Pokémon Battle Adventure**! This game brings the magical world of Pokémon to life, where you can step into the shoes of Ash and embark on an exciting journey to gather your Pokémon and engage in strategic battles against Team Rocket.
 
@@ -10,8 +10,6 @@ Welcome to **Pokémon Battle Adventure**! This game brings the magical world of 
   - [pokemon_find_screen.py](#pokemon_find_screenpy)
   - [elixir_screen.py](#elixir_screenpy)
   - [play_screen.py](#play_screenpy)
-- [UML Class Diagram](#uml-class-diagram)
-- [Result](#result)
 - [Contributing](#contributing)
 - [Contact](#contact)
 - [Authors](#authors)
@@ -44,6 +42,9 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - A player is eliminated if they exceed the fuel limit or fail to catch all Pokémon within 1 minute.
 - Ash's movements are controlled by the player, while Team Rocket's movements are guided by an A* algorithm.
 
+![Screenshot_1](https://github.com/user-attachments/assets/3739e050-e7cc-41cf-be0f-ff576a33c303)
+![Screenshot_2](https://github.com/user-attachments/assets/35098766-8068-4d25-9741-4387570dfc03)
+
 ### **elixir_screen.py**
 
 #### *Setup*
@@ -55,6 +56,11 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - Ash selects elixirs with user assistance.
 - Team Rocket uses a genetic algorithm with tournament selection for optimal elixir collection. Tournament selection picks the best-performing elixirs for each generation.
 - Final elixir collections are used in Pokémon battles to recover health points.
+
+![Screenshot_3](https://github.com/user-attachments/assets/71a4c888-d902-4967-a003-4fdc50e3d9e5)
+![Screenshot_4](https://github.com/user-attachments/assets/7814f2b2-14d6-4f23-9cd2-778c662ed38a)
+![Screenshot_5](https://github.com/user-attachments/assets/944e961a-9d76-4f3b-ae4c-19bb75c74f5f)
+![Screenshot_6](https://github.com/user-attachments/assets/a774a69c-74aa-4801-9ec1-8c923e53a0c5)
 
 ### **play_screen.py**
 
@@ -73,24 +79,10 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - Ash takes user input for actions, elixir usage, and Pokémon swaps.
 - Team Rocket uses the minimax algorithm to choose actions, with fuzzy logic aiding in deciding when to use elixirs or swap Pokémon.
 
-## **UML Class Diagram**
-
-- ![Insert UML Class Diagram Image Here](#)
-
-## **Result**
-
-In this section, we showcase the features of our application along with corresponding screenshots.
-
-- **Fig 3.1**: `announcement_screen.py` (for `pokemon_field_screen.py`)
-- **Fig 3.2**: `pokemon_field_screen.py`
-- **Fig 3.3**: `announcement_screen.py` (for `player_1_elixir_screen.py`)
-- **Fig 3.4**: `player_1_elixir_screen.py`
-- **Fig 3.5**: `announcement_screen.py` (for `player_0_elixir_screen.py`)
-- **Fig 3.6**: `player_0_elixir_screen.py`
-- **Fig 3.7**: `announcement_screen.py` (for `play_screen.py`)
-- **Fig 3.8**: `play_screen.py` (Electric Field, Team Rocket using defense, Ash using attack)
-- **Fig 3.9**: `play_screen.py` (Fire Field, Team Rocket using attack, Ash using defense)
-- **Fig 3.10**: `play_screen.py` (Water Field, Team Rocket using attack, Ash using attack)
+![Screenshot_7](https://github.com/user-attachments/assets/d890b07e-88fc-4db5-8250-a6be42c59278)
+![Screenshot_8](https://github.com/user-attachments/assets/35fd2717-c7f7-4738-a0a8-bdf1d1b44867)
+![Screenshot_9](https://github.com/user-attachments/assets/ad39fe70-90bd-4160-9261-9bd40d4c46f0)
+![Screenshot_10](https://github.com/user-attachments/assets/3926adbe-5afb-4e58-80c1-17958e51190d)
 
 ## **Contributing**
 
@@ -103,11 +95,7 @@ If you need help or want to share feedback, feel free to reach out at [israttasn
 ## **Authors**
 
 - **Israt Tasnim Esha**
-- **Hasibul Hasan Hasib**
+- **Tasfia Tasnim**
 
 *Department of Computer Science and Engineering*  
 *Khulna University of Engineering and Technology*
-
----
-
-This README is now formatted using Markdown elements such as `*`, `**`, and `-`, making it suitable for a GitHub project page.
