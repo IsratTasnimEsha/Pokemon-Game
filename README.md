@@ -42,8 +42,8 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - A player is eliminated if they exceed the fuel limit or fail to catch all Pokémon within 1 minute.
 - Ash's movements are controlled by the player, while Team Rocket's movements are guided by an A* algorithm.
 
-![Screenshot_1](https://github.com/user-attachments/assets/3739e050-e7cc-41cf-be0f-ff576a33c303)
-![Screenshot_2](https://github.com/user-attachments/assets/35098766-8068-4d25-9741-4387570dfc03)
+![Screenshot_1](https://github.com/user-attachments/assets/69c10ca2-3df1-482c-b5de-0e9fc595d530)
+![Screenshot_2](https://github.com/user-attachments/assets/b556b403-fb2b-490e-b8ef-4d3f004bac00)
 
 ### **elixir_screen.py**
 
@@ -57,10 +57,10 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - Team Rocket uses a genetic algorithm with tournament selection for optimal elixir collection. Tournament selection picks the best-performing elixirs for each generation.
 - Final elixir collections are used in Pokémon battles to recover health points.
 
-![Screenshot_3](https://github.com/user-attachments/assets/71a4c888-d902-4967-a003-4fdc50e3d9e5)
-![Screenshot_4](https://github.com/user-attachments/assets/7814f2b2-14d6-4f23-9cd2-778c662ed38a)
-![Screenshot_5](https://github.com/user-attachments/assets/944e961a-9d76-4f3b-ae4c-19bb75c74f5f)
-![Screenshot_6](https://github.com/user-attachments/assets/a774a69c-74aa-4801-9ec1-8c923e53a0c5)
+![Screenshot_3](https://github.com/user-attachments/assets/615d21c1-bfe5-4205-aaa5-2588ef666fc0)
+![Screenshot_4](https://github.com/user-attachments/assets/dbe47bec-3af1-44c0-aa74-bb2b77f160f7)
+![Screenshot_5](https://github.com/user-attachments/assets/2e6ce47c-6282-46ea-9bd2-6fdc57b026e8)
+![Screenshot_6](https://github.com/user-attachments/assets/bdb62e0b-2160-4bdd-8a69-d099b7b35cd3)
 
 ### **play_screen.py**
 
@@ -79,10 +79,10 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 - Ash takes user input for actions, elixir usage, and Pokémon swaps.
 - Team Rocket uses the minimax algorithm to choose actions, with fuzzy logic aiding in deciding when to use elixirs or swap Pokémon.
 
-![Screenshot_7](https://github.com/user-attachments/assets/d890b07e-88fc-4db5-8250-a6be42c59278)
-![Screenshot_8](https://github.com/user-attachments/assets/35fd2717-c7f7-4738-a0a8-bdf1d1b44867)
-![Screenshot_9](https://github.com/user-attachments/assets/ad39fe70-90bd-4160-9261-9bd40d4c46f0)
-![Screenshot_10](https://github.com/user-attachments/assets/3926adbe-5afb-4e58-80c1-17958e51190d)
+![Screenshot_7](https://github.com/user-attachments/assets/8428f720-ff7a-410e-9fae-0590a83101ab)
+![Screenshot_8](https://github.com/user-attachments/assets/2329ba46-bdbf-4efe-82fb-9deaebe0a6d5)
+![Screenshot_9](https://github.com/user-attachments/assets/70b636a9-ac3f-42ea-82fc-b170f3c707ca)
+![Screenshot_10](https://github.com/user-attachments/assets/0bddb3d8-7246-4aff-a644-14728202e5b4)
 
 ## **Contributing**
 
