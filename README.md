@@ -1,4 +1,4 @@
-![Screenshot_7](https://github.com/user-attachments/assets/ef20004c-2b08-419b-af32-ea3684e0d5b7)# **Pokémon Battle Adventure**
+# **Pokémon Battle Adventure**
 
 Welcome to **Pokémon Battle Adventure**! This game brings the magical world of Pokémon to life, where you can step into the shoes of Ash and embark on an exciting journey to gather your Pokémon and engage in strategic battles against Team Rocket.
 
