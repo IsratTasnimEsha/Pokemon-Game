@@ -39,6 +39,7 @@ Welcome to the magical world of Pokémon, where childhood dreams come alive and 
 
 #### *Mechanics*
 - Each player has a fuel limit of 15 liters to catch each Pokémon and a total of 1 minute to catch all Pokémon.
+- Traveling between locations costs 1 millisecond per unit of distance.
 - A player is eliminated if they exceed the fuel limit or fail to catch all Pokémon within 1 minute.
 - Ash's movements are controlled by the player, while Team Rocket's movements are guided by an A* algorithm.
 
