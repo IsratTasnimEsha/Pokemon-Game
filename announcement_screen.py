@@ -57,7 +57,8 @@ def announcement_screen(announcement):
                 2. Get Charmander's location from Nurse Joy after catching Pikachu.
                 3. Get Squirtle's location from Nurse Joy after catching Charmander.
                 4. Use your 15 liters of fuel wisely for each Pokémon.
-                5. Catch all Pokémon within 1 minute.\n
+                5. Traveling between locations will cost 1 millisecond per unit of distance.
+                6. Catch all Pokémon within 1 minute.\n
                 Good luck!
                 ''',
                 font, BLACK, window, WIDTH // 2 - 70, HEIGHT // 4)
