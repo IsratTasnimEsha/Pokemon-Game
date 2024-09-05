@@ -28,28 +28,22 @@ def draw_button_border(surface, rect, border_color, border_width):
     pygame.draw.rect(surface, border_color, rect, border_width)
 
 def draw_text_with_outline(text, font, text_color, outline_color, surface, x, y):
-    # Render the outline text
     outline_text = font.render(text, True, outline_color)
     outline_rect = outline_text.get_rect(center=(x, y))
 
-    # Render the main text
     main_text = font.render(text, True, text_color)
     main_rect = main_text.get_rect(center=(x, y))
 
-    # Draw the outline by offsetting the text
     offsets = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
     for offset in offsets:
         surface.blit(outline_text, (outline_rect.x + offset[0], outline_rect.y + offset[1]))
 
-    # Draw the main text on top
     surface.blit(main_text, main_rect)
 
-# Genetic Algorithm parameters
 population_size = 50
 max_generations = 100
 mutation_rate = 0.1
 
-# Function to generate an initial population randomly
 def generate_initial_population(population_size, num_items):
     population = []
     for _ in range(population_size):
@@ -57,7 +51,6 @@ def generate_initial_population(population_size, num_items):
         population.append(chromosome)
     return population
 
-# Function to evaluate fitness of a chromosome (solution)
 def fitness(chromosome, weight_profit, capacity):
     total_weight = 0
     total_profit = 0
@@ -66,11 +59,10 @@ def fitness(chromosome, weight_profit, capacity):
             total_weight += weight_profit[i][0]
             total_profit += weight_profit[i][1]
     if total_weight > capacity:
-        return 0  # Penalize solutions that exceed capacity
+        return 0 
     else:
         return total_profit
 
-# Function to perform tournament selection
 def tournament_selection(population, fitness_values, tournament_size):
     selected = []
     for _ in range(len(population)):
@@ -79,48 +71,47 @@ def tournament_selection(population, fitness_values, tournament_size):
         selected.append(winner[1])
     return selected
 
-# Function to perform crossover (single-point crossover)
 def crossover(parent1, parent2):
     crossover_point = random.randint(1, len(parent1) - 1)
     child1 = parent1[:crossover_point] + parent2[crossover_point:]
     child2 = parent2[:crossover_point] + parent1[crossover_point:]
     return child1, child2
 
-# Function to perform mutation
 def mutation(chromosome, mutation_rate):
     mutated_chromosome = []
     for gene in chromosome:
         if random.random() < mutation_rate:
-            mutated_chromosome.append(1 - gene)  # Flip the bit
+            mutated_chromosome.append(1 - gene) 
         else:
             mutated_chromosome.append(gene)
     return mutated_chromosome
 
-# Function to evolve the population using genetic algorithm
 def genetic_algorithm(weight_profit, capacity, population_size, max_generations, mutation_rate):
     num_items = len(weight_profit)
+
+    # 50 ta population er majhe randomly 5 ta select kora. prottekta ekekta chromosome
     population = generate_initial_population(population_size, num_items)
     
     for generation in range(max_generations):
+        # total_sum > capacity hole rturn 0, noile return total_sum
         fitness_values = [fitness(chromosome, weight_profit, capacity) for chromosome in population]
         
-        # Select parents for crossover
+        # fitness_value onuzayi sorted chromosome list return korbe
         selected_population = tournament_selection(population, fitness_values, 5)
         
-        # Perform crossover to create offspring
         offspring_population = []
+        # 25 ta child 1, 25 ta child 2 banabe
         for i in range(0, population_size, 2):
+            # sorted chromosome theke best 2 ta chromosome niye crossover korbe
             child1, child2 = crossover(selected_population[i], selected_population[i+1])
             offspring_population.append(child1)
             offspring_population.append(child2)
         
-        # Mutate some offspring
+        # mutation rate onujayi chromosome er bit flip korbe
         mutated_offspring = [mutation(chromosome, mutation_rate) for chromosome in offspring_population]
         
-        # Replace the population with the new generation (offspring)
         population = mutated_offspring
     
-    # Find the best solution in the final population
     final_fitness_values = [fitness(chromosome, weight_profit, capacity) for chromosome in population]
     best_index = final_fitness_values.index(max(final_fitness_values))
     best_solution = population[best_index]
@@ -168,7 +159,6 @@ def player_0_elixir_screen(elixir_price_power, remaining):
         draw_text_with_outline(f"Power: {elixir_price_power[3][1]}", font1, WHITE, BLACK, window, 940, 100)
         draw_text_with_outline(f"Power: {elixir_price_power[4][1]}", font1, WHITE, BLACK, window, 1095, 100)
 
-        # Redraw the owned images
         sum_of_power = 0
 
         for i in range(5):

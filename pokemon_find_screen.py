@@ -3,6 +3,7 @@ import sys
 import random
 import heapq
 import time
+import math
 
 pygame.init()
 
@@ -58,10 +59,16 @@ def draw_text_with_outline(text, font, text_color, outline_color, surface, x, y)
     surface.blit(main_text, main_rect)
 
 # A* algorithm function to find the shortest path
-def astar(adjacency_list, start, goal):
+def heuristic(node, goal, positions):
+    # Calculate Euclidean distance
+    node_pos = positions[node]
+    goal_pos = positions[goal]
+    return math.sqrt((node_pos[0] - goal_pos[0]) ** 2 + (node_pos[1] - goal_pos[1]) ** 2)
+
+def astar(adjacency_list, start, goal, positions):
     open_list = []
     closed_set = set()
-    heapq.heappush(open_list, (0, start, []))  # (f_cost, node, path)
+    heapq.heappush(open_list, (0 + heuristic(start, goal, positions), start, []))  # (f_cost, node, path)
 
     while open_list:
         current_cost, current_node, path = heapq.heappop(open_list)
@@ -76,7 +83,9 @@ def astar(adjacency_list, start, goal):
 
         for neighbor, cost in adjacency_list[current_node]:
             if neighbor not in closed_set:
-                heapq.heappush(open_list, (current_cost + cost, neighbor, path + [current_node]))
+                # Update the cost function to include the heuristic
+                total_cost = current_cost + cost + heuristic(neighbor, goal, positions)
+                heapq.heappush(open_list, (total_cost, neighbor, path + [current_node]))
 
     return None  # No path found
 
@@ -141,7 +150,7 @@ def pokemon_find_screen():
 
     # Find path from player_0_node to the next pokemon
     current_target_index = get_next_target()
-    path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index]) if current_target_index is not None else []
+    path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index], positions) if current_target_index is not None else []
 
     # Boolean to track if space was pressed
     space_pressed = False
@@ -183,6 +192,20 @@ def pokemon_find_screen():
                             if adj_node == clicked_node:
                                 player_1_costs[len(player_1_pokemon_indices)] += cost_value
                                 break
+                        
+                        # Extract coordinates
+                        player_pos = positions[player_1_node]
+                        mouse_x, mouse_y = mouse_pos
+                        player_x, player_y = player_pos
+
+                        # Calculate the Euclidean distance
+                        distance = math.sqrt((mouse_x - player_x) ** 2 + (mouse_y - player_y) ** 2)
+                        delay_time = max(int(distance * 0.5), 1)  # Adjust multiplier as needed
+                        print(f"Distance: {distance}, Delay Time 1: {delay_time}")
+
+                        pygame.time.wait(delay_time * 10)
+
+                        
                         player_1_node = clicked_node
                         space_pressed = False
             elif event.type == pygame.KEYDOWN:
@@ -240,6 +263,20 @@ def pokemon_find_screen():
                     if adj_node == next_node:
                         player_0_costs[len(player_0_pokemon_indices)] += cost_value
                         break
+                
+                # Extract coordinates
+                player_pos = positions[player_0_node]
+                mouse_x, mouse_y = positions[next_node]
+                player_x, player_y = player_pos
+
+                # Calculate the Euclidean distance
+                distance = math.sqrt((mouse_x - player_x) ** 2 + (mouse_y - player_y) ** 2)
+                delay_time = max(int(distance * 0.5), 1)  # Adjust multiplier as needed
+                print(f"Distance: {distance}, Delay Time 0: {delay_time}")
+
+                pygame.time.wait(delay_time * 10)
+
+
                 player_0_node = next_node
                 path_counter += 1
                 # Check if the current target is still available
@@ -247,7 +284,7 @@ def pokemon_find_screen():
                     # Recalculate path if the target Pokémon has been caught
                     current_target_index = get_next_target()
                     if current_target_index is not None:
-                        path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index])
+                        path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index], positions)
                         path_counter = 0
             else:
                 player_0_node = path_to_pokemon[-1]  # Ensure final position is shown
@@ -263,7 +300,7 @@ def pokemon_find_screen():
                         # Get the next target and find a new path
                         current_target_index = get_next_target()
                         if current_target_index is not None:
-                            path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index])
+                            path_to_pokemon = astar(adjacency_list, player_0_node, random_numbers[current_target_index], positions)
                             path_counter = 0
                         break
             
@@ -363,15 +400,15 @@ def pokemon_find_screen():
         # Convert milliseconds to seconds and format
         seconds = elapsed_time // 1000
 
-        if (40-seconds) > 10:
-            draw_text_with_outline(f"Time Remaining: {40-seconds} seconds", font, WHITE, BLACK, window, 1300, 720)
+        if (150-seconds) > 10:
+            draw_text_with_outline(f"Time Remaining: {150-seconds} seconds", font, WHITE, BLACK, window, 1300, 720)
         else:
-            draw_text_with_outline(f"Time Remaining: {40-seconds} seconds", font, RED, BLACK, window, 1300, 720)
+            draw_text_with_outline(f"Time Remaining: {150-seconds} seconds", font, RED, BLACK, window, 1300, 720)
 
         pygame.display.flip()
 
         # Check if 30 seconds have elapsed
-        if seconds >= 40:
+        if seconds >= 150:
             if len(player_0_pokemon_indices) != 3:
                 return player_0_pokemon_indices, player_1_pokemon_indices, player_0_costs, player_1_costs, "Me(Ash)"
             elif len(player_1_pokemon_indices) != 3:

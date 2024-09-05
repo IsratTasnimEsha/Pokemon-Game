@@ -1,10 +1,22 @@
-def calculate_suitability(score):
-    if score == -8:
-        return -1
-    elif score == 8:
-        return 1
+def fuzzify_score(score):
+    """Fuzzify the score into fuzzy membership values."""
+    if score <= -8:
+        return {'low': 1.0, 'medium': 0.0, 'high': 0.0}
+    elif -8 < score < 0:
+        return {'low': (0 - score) / 8, 'medium': 1 - abs(score) / 8, 'high': 0.0}
+    elif 0 <= score <= 8:
+        return {'low': 0.0, 'medium': score / 8, 'high': 1.0}
     else:
-        return 2*score/(8-(-8))
+        return {'low': 0.0, 'medium': 0.0, 'high': 1.0}
+
+def rule_evaluation(fuzzy_values):
+    """Evaluate fuzzy rules to get fuzzy results."""
+    # Simple rule: higher score should correspond to higher suitability
+    return fuzzy_values['medium'] * 0.5 + fuzzy_values['high'] * 1.0
+
+def defuzzify(suitability):
+    """Convert fuzzy suitability to a crisp value."""
+    return suitability
 
 def get_score(current_field_index, player0_index, player1_index):
     """Calculates the combined field and matchup score."""
@@ -46,9 +58,11 @@ def find_best_pokemon_index(player0_current_pokemon_index, player1_current_pokem
         if player0_healths[player0_index] == 0 and player0_index != player0_current_pokemon_index:
             continue
         score = get_score(current_field_index, player0_index, player1_current_pokemon_index)
-        suitability = calculate_suitability(score)
-        print(f"Suitability for player0_index {player0_index}: {suitability}")
-        suitabilities.append((player0_index, suitability))
+        fuzzy_values = fuzzify_score(score)
+        suitability = rule_evaluation(fuzzy_values)
+        crisp_suitability = defuzzify(suitability)
+        print(f"Suitability for player0_index {player0_index}: {crisp_suitability}")
+        suitabilities.append((player0_index, crisp_suitability))
 
     # Sort the indices according to suitability
     sorted_indices = [index for index, suitability in sorted(suitabilities, key=lambda x: x[1], reverse=True)]
@@ -59,5 +73,5 @@ def find_best_pokemon_index(player0_current_pokemon_index, player1_current_pokem
     else:
         return sorted_indices[0]
 
-#best_pokemon_index = find_best_pokemon_index(0, 1, 'water', [100, 0, 0], [40, 30, 45])
+#best_pokemon_index = find_best_pokemon_index(0, 0, 'electric', [100, 20, 70], [40, 30, 50])
 #print("Best Pokémon index for player0:", best_pokemon_index)
