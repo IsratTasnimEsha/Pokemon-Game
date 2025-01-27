@@ -2,18 +2,6 @@
 
 Welcome to **Pokémon Battle Adventure**! This game brings the magical world of Pokémon to life, where you can step into the shoes of Ash and embark on an exciting journey to gather your Pokémon and engage in strategic battles against Team Rocket.
 
-## **Table of Contents**
-- [Introduction](#introduction)
-  - [Background](#background)
-  - [Objectives and Goals](#objectives-and-goals)
-- [Methodology](#methodology)
-  - [pokemon_find_screen.py](#pokemon_find_screenpy)
-  - [elixir_screen.py](#elixir_screenpy)
-  - [play_screen.py](#play_screenpy)
-- [Contributing](#contributing)
-- [Contact](#contact)
-- [Authors](#authors)
-
 ## **Introduction**
 
 ### **Background**
