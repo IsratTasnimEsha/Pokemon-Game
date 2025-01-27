@@ -100,4 +100,5 @@ If you need help or want to share feedback, feel free to reach out at [israttasn
 
 **CSE 4110	- Artificial Intelligence Laboratory**  
 *Department of Computer Science and Engineering*  
-*Khulna University of Engineering and Technology*
+*Khulna University of Engineering and Technology*           
+**Year:** 2024
